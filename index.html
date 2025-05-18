@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Cen Paliw w Polsce</title>
-    <!-- Dodajemy CSS Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/mapdata/countries/pl/pl-all.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
         h1 {
             text-align: center;
@@ -34,7 +35,7 @@
             width: 100%;
             max-width: 800px;
         }
-        select, button {
+        select {
             padding: 8px 15px;
             margin: 0 5px;
             border: 1px solid #ddd;
@@ -42,50 +43,34 @@
             background-color: white;
             font-size: 14px;
         }
-        select:focus, button:focus {
-            outline: none;
-            border-color: #4c8bf5;
-        }
-        button {
-            background-color: #4c8bf5;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #3a70d6;
-        }
-        #map {
+        #map-container {
             width: 100%;
-            height: 500px;
             max-width: 800px;
-            border-radius: 8px;
+            height: 600px;
             margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .legend {
             margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #fff;
             padding: 15px;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 800px;
+            text-align: center;
         }
         .gradient {
             height: 20px;
             width: 300px;
             background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
-            margin-bottom: 5px;
+            margin: 10px auto;
             border-radius: 4px;
         }
         .legend-labels {
             display: flex;
             justify-content: space-between;
             width: 300px;
+            margin: 0 auto;
             font-size: 14px;
             color: #555;
         }
@@ -117,22 +102,6 @@
             padding: 20px;
             color: #666;
         }
-        .info {
-            padding: 6px 8px;
-            font: 14px/16px Arial, Helvetica, sans-serif;
-            background: white;
-            background: rgba(255,255,255,0.8);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            border-radius: 5px;
-        }
-        .info h4 {
-            margin: 0 0 5px;
-            color: #777;
-        }
-        .price-value {
-            font-weight: bold;
-            font-size: 15px;
-        }
     </style>
 </head>
 <body>
@@ -152,8 +121,7 @@
         <div id="loading" class="loading">Ładowanie danych...</div>
         <div id="error" class="error" style="display: none;"></div>
         
-        <!-- Kontener na mapę -->
-        <div id="map"></div>
+        <div id="map-container"></div>
         
         <div class="legend">
             <p>Cena paliwa (PLN/litr):</p>
@@ -170,37 +138,39 @@
         </div>
     </div>
 
-    <!-- Dodajemy skrypty Leaflet -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Globalny obiekt z danymi województw
-        const voivodeships = {
-            "dolnoslaskie": { name: "Dolnośląskie", center: [51.1, 16.8] },
-            "kujawsko-pomorskie": { name: "Kujawsko-Pomorskie", center: [53.1, 18.6] },
-            "lubelskie": { name: "Lubelskie", center: [51.2, 23.1] },
-            "lubuskie": { name: "Lubuskie", center: [52.3, 15.3] },
-            "lodzkie": { name: "Łódzkie", center: [51.6, 19.4] },
-            "malopolskie": { name: "Małopolskie", center: [49.9, 20.1] },
-            "mazowieckie": { name: "Mazowieckie", center: [52.2, 21.2] },
-            "opolskie": { name: "Opolskie", center: [50.7, 17.9] },
-            "podkarpackie": { name: "Podkarpackie", center: [50.1, 22.1] },
-            "podlaskie": { name: "Podlaskie", center: [53.2, 22.9] },
-            "pomorskie": { name: "Pomorskie", center: [54.2, 18.2] },
-            "slaskie": { name: "Śląskie", center: [50.3, 19.0] },
-            "swietokrzyskie": { name: "Świętokrzyskie", center: [50.8, 20.8] },
-            "warminsko-mazurskie": { name: "Warmińsko-Mazurskie", center: [53.8, 20.5] },
-            "wielkopolskie": { name: "Wielkopolskie", center: [52.4, 17.0] },
-            "zachodniopomorskie": { name: "Zachodniopomorskie", center: [53.5, 15.0] }
+        // Mapowanie kodów województw z Highmaps do nazw w danych
+        const voivodeshipMapping = {
+            'pl-ds': 'dolnoslaskie',
+            'pl-kp': 'kujawsko-pomorskie',
+            'pl-lu': 'lubelskie',
+            'pl-lb': 'lubuskie',
+            'pl-ld': 'lodzkie',
+            'pl-ma': 'malopolskie',
+            'pl-mz': 'mazowieckie',
+            'pl-op': 'opolskie',
+            'pl-pk': 'podkarpackie',
+            'pl-pd': 'podlaskie',
+            'pl-pm': 'pomorskie',
+            'pl-sl': 'slaskie',
+            'pl-sk': 'swietokrzyskie',
+            'pl-wn': 'warminsko-mazurskie',
+            'pl-wp': 'wielkopolskie',
+            'pl-zp': 'zachodniopomorskie'
         };
+
+        // Reverse mapping
+        const reverseMapping = {};
+        for (const key in voivodeshipMapping) {
+            reverseMapping[voivodeshipMapping[key]] = key;
+        }
 
         // Zmienne globalne
         let fuelData = null;
         let selectedFuelType = "PB95";
         let minPrice = Number.MAX_VALUE;
         let maxPrice = 0;
-        let map = null;
-        let geojson = null;
-        let info = null;
+        let chart = null;
 
         // Pobierz dane o cenach paliw
         async function fetchFuelPrices() {
@@ -244,7 +214,7 @@
                 minPrice = 5.0;
                 maxPrice = 6.0;
             } else {
-                // Zaokrąglamy do 2 miejsc po przecinku
+                // Zaokrąglamy do 2 miejsc po przecinku i dodajemy margines
                 minPrice = Math.floor(minPrice * 100) / 100;
                 maxPrice = Math.ceil(maxPrice * 100) / 100;
             }
@@ -253,188 +223,174 @@
             document.getElementById('min-price').textContent = minPrice.toFixed(2);
             document.getElementById('mid-price').textContent = ((minPrice + maxPrice) / 2).toFixed(2);
             document.getElementById('max-price').textContent = maxPrice.toFixed(2);
+            
+            return [minPrice, maxPrice];
         }
 
-        // Oblicz kolor dla danej ceny
-        function getPriceColor(price) {
-            if (price === null || price === undefined) {
-                return '#cccccc'; // Szary dla braku danych
-            }
+        // Przygotuj dane do wyświetlenia na mapie
+        function prepareMapData(data, fuelType) {
+            const mapData = [];
             
-            // Normalizuj cenę do zakresu 0-1
-            const normalizedPrice = (price - minPrice) / (maxPrice - minPrice);
-            
-            // Przelicz na kolor od zielonego (niskie ceny) przez żółty do czerwonego (wysokie ceny)
-            if (normalizedPrice < 0.5) {
-                // Od zielonego do żółtego
-                const r = Math.floor(normalizedPrice * 2 * 255);
-                return `rgb(${r}, 255, 0)`;
-            } else {
-                // Od żółtego do czerwonego
-                const g = Math.floor((1 - (normalizedPrice - 0.5) * 2) * 255);
-                return `rgb(255, ${g}, 0)`;
-            }
-        }
-
-        // Ustawia style dla regionów GeoJSON
-        function style(feature) {
-            const voivodeshipId = feature.properties.id;
-            let color = '#cccccc'; // domyślny kolor szary
-            let fillOpacity = 0.7;
-            
-            if (fuelData && fuelData.voivodeships[voivodeshipId]) {
-                const price = fuelData.voivodeships[voivodeshipId].prices[selectedFuelType];
+            for (const voivodeship in data.voivodeships) {
+                const highchartsCode = reverseMapping[voivodeship];
+                if (!highchartsCode) continue;
+                
+                const price = data.voivodeships[voivodeship].prices[fuelType];
+                
                 if (price !== null && price !== undefined) {
-                    color = getPriceColor(price);
+                    mapData.push({
+                        'hc-key': highchartsCode,
+                        value: price,
+                        name: getPolishName(voivodeship)
+                    });
+                } else {
+                    mapData.push({
+                        'hc-key': highchartsCode,
+                        value: null,
+                        name: getPolishName(voivodeship)
+                    });
                 }
             }
             
-            return {
-                fillColor: color,
-                weight: 1,
-                opacity: 1,
-                color: 'white',
-                dashArray: '3',
-                fillOpacity: fillOpacity
+            return mapData;
+        }
+
+        // Uzyskaj polską nazwę województwa
+        function getPolishName(voivodeship) {
+            const names = {
+                'dolnoslaskie': 'Dolnośląskie',
+                'kujawsko-pomorskie': 'Kujawsko-Pomorskie',
+                'lubelskie': 'Lubelskie',
+                'lubuskie': 'Lubuskie',
+                'lodzkie': 'Łódzkie',
+                'malopolskie': 'Małopolskie',
+                'mazowieckie': 'Mazowieckie',
+                'opolskie': 'Opolskie',
+                'podkarpackie': 'Podkarpackie',
+                'podlaskie': 'Podlaskie',
+                'pomorskie': 'Pomorskie',
+                'slaskie': 'Śląskie',
+                'swietokrzyskie': 'Świętokrzyskie',
+                'warminsko-mazurskie': 'Warmińsko-Mazurskie',
+                'wielkopolskie': 'Wielkopolskie',
+                'zachodniopomorskie': 'Zachodniopomorskie'
             };
+            
+            return names[voivodeship] || voivodeship;
         }
 
-        // Funkcja wywoływana przy najechaniu myszką na region
-        function highlightFeature(e) {
-            const layer = e.target;
-
-            layer.setStyle({
-                weight: 2,
-                color: '#666',
-                dashArray: '',
-                fillOpacity: 0.7
-            });
-
-            layer.bringToFront();
-            info.update(layer.feature.properties);
-        }
-
-        // Funkcja resetująca styl po zjechaniu myszką z regionu
-        function resetHighlight(e) {
-            geojson.resetStyle(e.target);
-            info.update();
-        }
-
-        // Funkcja wywoływana po kliknięciu na region
-        function zoomToFeature(e) {
-            map.fitBounds(e.target.getBounds());
-        }
-
-        // Dodaje interakcje do regionów
-        function onEachFeature(feature, layer) {
-            layer.on({
-                mouseover: highlightFeature,
-                mouseout: resetHighlight,
-                click: zoomToFeature
-            });
-        }
-
-        // Dodaj panel informacyjny
-        function createInfoPanel() {
-            info = L.control();
-
-            info.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'info');
-                this.update();
-                return this._div;
-            };
-
-            info.update = function (props) {
-                if (!props) {
-                    this._div.innerHTML = '<h4>Wybierz województwo</h4>';
-                    return;
-                }
-                
-                const voivodeshipId = props.id;
-                let priceHtml = 'Brak danych';
-                
-                if (fuelData && fuelData.voivodeships[voivodeshipId]) {
-                    const price = fuelData.voivodeships[voivodeshipId].prices[selectedFuelType];
-                    if (price !== null && price !== undefined) {
-                        priceHtml = `<span class="price-value">${price.toFixed(2)} PLN/l</span>`;
+        // Utworzenie mapy
+        function createMap(data, fuelType) {
+            const [min, max] = calculatePriceRange(data, fuelType);
+            const mapData = prepareMapData(data, fuelType);
+            
+            // Inicjalizacja mapy Highcharts
+            chart = Highcharts.mapChart('map-container', {
+                chart: {
+                    map: 'countries/pl/pl-all'
+                },
+                title: {
+                    text: `Ceny ${getFuelName(fuelType)} w Polsce`,
+                    style: {
+                        fontSize: '18px'
                     }
-                }
-                
-                this._div.innerHTML = `<h4>${props.name}</h4>
-                    ${selectedFuelType}: ${priceHtml}`;
-            };
-
-            info.addTo(map);
+                },
+                subtitle: {
+                    text: 'Kliknij na województwo, aby zobaczyć szczegóły'
+                },
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'bottom'
+                    }
+                },
+                colorAxis: {
+                    min: min,
+                    max: max,
+                    stops: [
+                        [0, '#00ff00'],   // zielony dla niskich cen
+                        [0.5, '#ffff00'], // żółty dla średnich cen
+                        [1, '#ff0000']    // czerwony dla wysokich cen
+                    ],
+                    labels: {
+                        format: '{value} zł'
+                    }
+                },
+                series: [{
+                    data: mapData,
+                    name: getFuelName(fuelType),
+                    states: {
+                        hover: {
+                            color: '#a4edba'
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}'
+                    },
+                    tooltip: {
+                        pointFormat: '{point.name}: <b>{point.value} zł</b><br/>'
+                    },
+                    nullColor: '#cccccc'
+                }]
+            });
         }
 
-        // Dane GeoJSON dla województw Polski
-        const polandData = {
-            "type": "FeatureCollection",
-            "features": [
-                {"type": "Feature", "properties": {"name": "Dolnośląskie", "id": "dolnoslaskie"}, "geometry": {"type": "Polygon", "coordinates": [[[15.7, 50.8], [17.0, 50.8], [17.0, 51.8], [15.7, 51.8], [15.7, 50.8]]]}},
-                {"type": "Feature", "properties": {"name": "Kujawsko-Pomorskie", "id": "kujawsko-pomorskie"}, "geometry": {"type": "Polygon", "coordinates": [[[17.5, 52.7], [19.7, 52.7], [19.7, 53.5], [17.5, 53.5], [17.5, 52.7]]]}},
-                {"type": "Feature", "properties": {"name": "Lubelskie", "id": "lubelskie"}, "geometry": {"type": "Polygon", "coordinates": [[[21.6, 50.4], [23.6, 50.4], [23.6, 52.0], [21.6, 52.0], [21.6, 50.4]]]}},
-                {"type": "Feature", "properties": {"name": "Lubuskie", "id": "lubuskie"}, "geometry": {"type": "Polygon", "coordinates": [[[14.5, 51.6], [16.0, 51.6], [16.0, 53.0], [14.5, 53.0], [14.5, 51.6]]]}},
-                {"type": "Feature", "properties": {"name": "Łódzkie", "id": "lodzkie"}, "geometry": {"type": "Polygon", "coordinates": [[[18.4, 50.9], [20.4, 50.9], [20.4, 52.3], [18.4, 52.3], [18.4, 50.9]]]}},
-                {"type": "Feature", "properties": {"name": "Małopolskie", "id": "malopolskie"}, "geometry": {"type": "Polygon", "coordinates": [[[19.1, 49.4], [21.1, 49.4], [21.1, 50.5], [19.1, 50.5], [19.1, 49.4]]]}},
-                {"type": "Feature", "properties": {"name": "Mazowieckie", "id": "mazowieckie"}, "geometry": {"type": "Polygon", "coordinates": [[[19.8, 51.1], [22.9, 51.1], [22.9, 53.5], [19.8, 53.5], [19.8, 51.1]]]}},
-                {"type": "Feature", "properties": {"name": "Opolskie", "id": "opolskie"}, "geometry": {"type": "Polygon", "coordinates": [[[17.0, 50.0], [18.4, 50.0], [18.4, 51.2], [17.0, 51.2], [17.0, 50.0]]]}},
-                {"type": "Feature", "properties": {"name": "Podkarpackie", "id": "podkarpackie"}, "geometry": {"type": "Polygon", "coordinates": [[[21.0, 49.0], [23.0, 49.0], [23.0, 50.8], [21.0, 50.8], [21.0, 49.0]]]}},
-                {"type": "Feature", "properties": {"name": "Podlaskie", "id": "podlaskie"}, "geometry": {"type": "Polygon", "coordinates": [[[21.8, 52.0], [23.9, 52.0], [23.9, 54.0], [21.8, 54.0], [21.8, 52.0]]]}},
-                {"type": "Feature", "properties": {"name": "Pomorskie", "id": "pomorskie"}, "geometry": {"type": "Polygon", "coordinates": [[[17.0, 53.9], [19.7, 53.9], [19.7, 54.9], [17.0, 54.9], [17.0, 53.9]]]}},
-                {"type": "Feature", "properties": {"name": "Śląskie", "id": "slaskie"}, "geometry": {"type": "Polygon", "coordinates": [[[18.2, 49.5], [19.9, 49.5], [19.9, 51.0], [18.2, 51.0], [18.2, 49.5]]]}},
-                {"type": "Feature", "properties": {"name": "Świętokrzyskie", "id": "swietokrzyskie"}, "geometry": {"type": "Polygon", "coordinates": [[[19.8, 50.4], [21.8, 50.4], [21.8, 51.3], [19.8, 51.3], [19.8, 50.4]]]}},
-                {"type": "Feature", "properties": {"name": "Warmińsko-Mazurskie", "id": "warminsko-mazurskie"}, "geometry": {"type": "Polygon", "coordinates": [[[19.0, 53.1], [22.5, 53.1], [22.5, 54.5], [19.0, 54.5], [19.0, 53.1]]]}},
-                {"type": "Feature", "properties": {"name": "Wielkopolskie", "id": "wielkopolskie"}, "geometry": {"type": "Polygon", "coordinates": [[[15.8, 51.3], [18.4, 51.3], [18.4, 53.5], [15.8, 53.5], [15.8, 51.3]]]}},
-                {"type": "Feature", "properties": {"name": "Zachodniopomorskie", "id": "zachodniopomorskie"}, "geometry": {"type": "Polygon", "coordinates": [[[14.1, 53.0], [16.9, 53.0], [16.9, 54.5], [14.1, 54.5], [14.1, 53.0]]]}}
-            ]
-        };
+        // Uzyskaj pełną nazwę paliwa
+        function getFuelName(fuelType) {
+            const names = {
+                'PB95': 'Benzyna PB95',
+                'PB98': 'Benzyna PB98',
+                'ON': 'Olej napędowy',
+                'LPG': 'LPG'
+            };
+            
+            return names[fuelType] || fuelType;
+        }
 
-        // Aktualizuj mapę na podstawie danych
-        function updateMap(data, fuelType) {
-            calculatePriceRange(data, fuelType);
+        // Aktualizuj mapę
+        function updateMap() {
+            if (!fuelData || !chart) return;
             
-            if (geojson) {
-                geojson.setStyle(style);
-            }
+            const [min, max] = calculatePriceRange(fuelData, selectedFuelType);
+            const mapData = prepareMapData(fuelData, selectedFuelType);
             
-            if (info) {
-                info.update();
-            }
+            // Aktualizuj tytuł
+            chart.setTitle({ text: `Ceny ${getFuelName(selectedFuelType)} w Polsce` });
+            
+            // Aktualizuj oś kolorów
+            chart.colorAxis[0].update({
+                min: min,
+                max: max
+            });
+            
+            // Aktualizuj dane
+            chart.series[0].update({
+                name: getFuelName(selectedFuelType),
+                data: mapData
+            });
+        }
+
+        // Obsługa zmiany typu paliwa
+        function setupFuelTypeSelect() {
+            const fuelTypeSelect = document.getElementById('fuel-type');
+            fuelTypeSelect.addEventListener('change', (e) => {
+                selectedFuelType = e.target.value;
+                updateMap();
+            });
         }
 
         // Główna funkcja inicjalizująca
         async function initialize() {
-            // Inicjalizacja mapy
-            map = L.map('map').setView([52.1, 19.4], 6);
-
-            // Dodaj warstwę OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
             // Pobierz dane
             fuelData = await fetchFuelPrices();
             if (!fuelData) return;
             
-            // Dodaj dane GeoJSON do mapy
-            geojson = L.geoJson(polandData, {
-                style: style,
-                onEachFeature: onEachFeature
-            }).addTo(map);
+            // Utwórz mapę
+            createMap(fuelData, selectedFuelType);
             
-            // Dodaj panel informacyjny
-            createInfoPanel();
-            
-            // Ustaw dropdown z typami paliw
-            const fuelTypeSelect = document.getElementById('fuel-type');
-            fuelTypeSelect.addEventListener('change', (e) => {
-                selectedFuelType = e.target.value;
-                updateMap(fuelData, selectedFuelType);
-            });
-            
-            // Aktualizuj mapę z początkowymi danymi
-            updateMap(fuelData, selectedFuelType);
+            // Ustaw obsługę zmiany typu paliwa
+            setupFuelTypeSelect();
         }
 
         // Uruchom po załadowaniu strony
