@@ -34,7 +34,7 @@ VOIVODESHIPS = {
     "swietokrzyskie": "https://www.reflex.com.pl/swietokrzyskie-wojewodztwo",
     "warminsko-mazurskie": "https://www.reflex.com.pl/warminsko-mazurskie-wojewodztwo",
     "wielkopolskie": "https://www.reflex.com.pl/wielkopolskie-wojewodztwo",
-    "zachodniopomorskie": "https://www.reflex.com.pl/zachodniopomorskie-wojewodztwo"
+    "zachodniopomorskie": "https://www.reflex.com.pl/zachodnipomorskie-wojewodztwo"
 }
 
 # Nazwy paliw
