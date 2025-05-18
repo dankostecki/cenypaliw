@@ -3,138 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Cen Paliw w Polsce</title>
+    <title>Ceny Paliw w Polsce</title>
     <script src="https://code.highcharts.com/maps/highmaps.js"></script>
     <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/mapdata/countries/pl/pl-all.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --light-gray: #e0e0e0;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f8f9fa;
         }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
         h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
         }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
         .controls {
-            margin: 20px 0;
-            text-align: center;
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 800px;
-        }
-        select {
-            padding: 8px 15px;
-            margin: 0 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            font-size: 14px;
-        }
-        #map-container {
-            width: 100%;
-            max-width: 800px;
-            height: 600px;
-            margin: 20px 0;
-        }
-        .legend {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-        }
-        .gradient {
-            height: 20px;
-            width: 300px;
-            background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
-            margin: 10px auto;
-            border-radius: 4px;
-        }
-        .legend-labels {
             display: flex;
             justify-content: space-between;
-            width: 300px;
-            margin: 0 auto;
-            font-size: 14px;
-            color: #555;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        .update-info {
-            margin-top: 20px;
+
+        select {
+            padding: 0.8rem 1.5rem;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius);
+            background-color: var(--card-color);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-grow: 1;
+            max-width: 300px;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .map-container {
+            height: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .fuel-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .fuel-card {
+            background-color: var(--card-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
             text-align: center;
-            font-style: italic;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .fuel-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .fuel-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .fuel-card .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .fuel-card .change {
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .decrease {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .increase {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .info-footer {
+            font-size: 0.9rem;
             color: #666;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 800px;
-        }
-        .error {
-            color: #d32f2f;
             text-align: center;
-            padding: 20px;
-            background-color: #ffebee;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 800px;
+            padding: 1rem;
+            background-color: var(--card-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
+
         .loading {
-            text-align: center;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            font-size: 1.2rem;
             color: #666;
+        }
+
+        .error {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .selected-fuel-title {
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            select {
+                max-width: 100%;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Mapa Cen Paliw w Polsce</h1>
-        
-        <div class="controls">
-            <label for="fuel-type">Wybierz rodzaj paliwa: </label>
-            <select id="fuel-type">
-                <option value="PB95">Benzyna PB95</option>
-                <option value="PB98">Benzyna PB98</option>
-                <option value="ON">Olej napędowy</option>
-                <option value="LPG">LPG</option>
-            </select>
+    <header>
+        <div class="container">
+            <h1>Ceny Paliw w Polsce</h1>
+            <p class="subtitle">Aktualne dane ze wszystkich województw</p>
         </div>
+    </header>
 
-        <div id="loading" class="loading">Ładowanie danych...</div>
-        <div id="error" class="error" style="display: none;"></div>
-        
-        <div id="map-container"></div>
-        
-        <div class="legend">
-            <p>Cena paliwa (PLN/litr):</p>
-            <div class="gradient"></div>
-            <div class="legend-labels">
-                <span id="min-price">5.00</span>
-                <span id="mid-price">5.50</span>
-                <span id="max-price">6.00</span>
+    <div class="container">
+        <div class="card">
+            <div class="controls">
+                <select id="fuel-type">
+                    <option value="PB95">Benzyna PB95</option>
+                    <option value="PB98">Benzyna PB98</option>
+                    <option value="ON">Olej napędowy</option>
+                    <option value="LPG">LPG</option>
+                </select>
+                <p id="update-timestamp">Ostatnia aktualizacja: ładowanie...</p>
             </div>
         </div>
+
+        <div id="loading" class="loading">
+            <div>Ładowanie danych...</div>
+        </div>
         
-        <div class="update-info">
-            <p id="update-timestamp">Ostatnia aktualizacja: ładowanie...</p>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <h2 id="selected-fuel-title" class="selected-fuel-title">Benzyna PB95</h2>
+        
+        <div id="map-container" class="map-container" style="display: none;"></div>
+        
+        <div id="fuel-info" class="fuel-info" style="display: none;">
+            <!-- Tutaj będą wyświetlane karty z informacjami o cenach -->
+        </div>
+        
+        <div id="info-footer" class="info-footer" style="display: none;">
+            Dane są aktualizowane codziennie o godzinie 06:00. Źródło: Reflex.com.pl
         </div>
     </div>
 
@@ -165,6 +285,26 @@
             reverseMapping[voivodeshipMapping[key]] = key;
         }
 
+        // Polskie nazwy województw
+        const polishNames = {
+            'dolnoslaskie': 'Dolnośląskie',
+            'kujawsko-pomorskie': 'Kujawsko-Pomorskie',
+            'lubelskie': 'Lubelskie',
+            'lubuskie': 'Lubuskie',
+            'lodzkie': 'Łódzkie',
+            'malopolskie': 'Małopolskie',
+            'mazowieckie': 'Mazowieckie',
+            'opolskie': 'Opolskie',
+            'podkarpackie': 'Podkarpackie',
+            'podlaskie': 'Podlaskie',
+            'pomorskie': 'Pomorskie',
+            'slaskie': 'Śląskie',
+            'swietokrzyskie': 'Świętokrzyskie',
+            'warminsko-mazurskie': 'Warmińsko-Mazurskie',
+            'wielkopolskie': 'Wielkopolskie',
+            'zachodniopomorskie': 'Zachodniopomorskie'
+        };
+
         // Zmienne globalne
         let fuelData = null;
         let selectedFuelType = "PB95";
@@ -182,6 +322,9 @@
                 
                 const data = await response.json();
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('map-container').style.display = 'block';
+                document.getElementById('fuel-info').style.display = 'grid';
+                document.getElementById('info-footer').style.display = 'block';
                 
                 // Aktualizuj informację o czasie aktualizacji
                 document.getElementById('update-timestamp').textContent = 
@@ -219,11 +362,6 @@
                 maxPrice = Math.ceil(maxPrice * 100) / 100;
             }
             
-            // Aktualizuj etykiety legendy
-            document.getElementById('min-price').textContent = minPrice.toFixed(2);
-            document.getElementById('mid-price').textContent = ((minPrice + maxPrice) / 2).toFixed(2);
-            document.getElementById('max-price').textContent = maxPrice.toFixed(2);
-            
             return [minPrice, maxPrice];
         }
 
@@ -241,13 +379,13 @@
                     mapData.push({
                         'hc-key': highchartsCode,
                         value: price,
-                        name: getPolishName(voivodeship)
+                        name: polishNames[voivodeship] || voivodeship
                     });
                 } else {
                     mapData.push({
                         'hc-key': highchartsCode,
                         value: null,
-                        name: getPolishName(voivodeship)
+                        name: polishNames[voivodeship] || voivodeship
                     });
                 }
             }
@@ -255,28 +393,51 @@
             return mapData;
         }
 
-        // Uzyskaj polską nazwę województwa
-        function getPolishName(voivodeship) {
+        // Uzyskaj pełną nazwę paliwa
+        function getFuelName(fuelType) {
             const names = {
-                'dolnoslaskie': 'Dolnośląskie',
-                'kujawsko-pomorskie': 'Kujawsko-Pomorskie',
-                'lubelskie': 'Lubelskie',
-                'lubuskie': 'Lubuskie',
-                'lodzkie': 'Łódzkie',
-                'malopolskie': 'Małopolskie',
-                'mazowieckie': 'Mazowieckie',
-                'opolskie': 'Opolskie',
-                'podkarpackie': 'Podkarpackie',
-                'podlaskie': 'Podlaskie',
-                'pomorskie': 'Pomorskie',
-                'slaskie': 'Śląskie',
-                'swietokrzyskie': 'Świętokrzyskie',
-                'warminsko-mazurskie': 'Warmińsko-Mazurskie',
-                'wielkopolskie': 'Wielkopolskie',
-                'zachodniopomorskie': 'Zachodniopomorskie'
+                'PB95': 'Benzyna PB95',
+                'PB98': 'Benzyna PB98',
+                'ON': 'Olej napędowy',
+                'LPG': 'LPG (Autogaz)'
             };
             
-            return names[voivodeship] || voivodeship;
+            return names[fuelType] || fuelType;
+        }
+
+        // Aktualizuj informacje o cenach paliw dla poszczególnych województw
+        function updateFuelInfo(data, fuelType) {
+            const container = document.getElementById('fuel-info');
+            container.innerHTML = '';
+
+            // Sortuj województwa według ceny (od najniższej do najwyższej)
+            let voivodeships = [];
+            for (const voivodeship in data.voivodeships) {
+                const price = data.voivodeships[voivodeship].prices[fuelType];
+                if (price !== null && price !== undefined) {
+                    voivodeships.push({
+                        name: voivodeship,
+                        price: price
+                    });
+                }
+            }
+            
+            voivodeships.sort((a, b) => a.price - b.price);
+            
+            // Wyświetlenie top 4 najtańszych wojewóztw
+            for (let i = 0; i < 4 && i < voivodeships.length; i++) {
+                const voivodeship = voivodeships[i];
+                const card = document.createElement('div');
+                card.className = 'fuel-card';
+                
+                card.innerHTML = `
+                    <h3>${polishNames[voivodeship.name] || voivodeship.name}</h3>
+                    <div class="price">${voivodeship.price.toFixed(2)} zł</div>
+                    <div class="change decrease">Najtańsze w kraju</div>
+                `;
+                
+                container.appendChild(card);
+            }
         }
 
         // Utworzenie mapy
@@ -284,19 +445,20 @@
             const [min, max] = calculatePriceRange(data, fuelType);
             const mapData = prepareMapData(data, fuelType);
             
+            // Aktualizuj tytuł wybranego paliwa
+            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(fuelType)} w Polsce`;
+            
             // Inicjalizacja mapy Highcharts
             chart = Highcharts.mapChart('map-container', {
                 chart: {
-                    map: 'countries/pl/pl-all'
+                    map: 'countries/pl/pl-all',
+                    backgroundColor: 'transparent'
                 },
                 title: {
-                    text: `Ceny ${getFuelName(fuelType)} w Polsce`,
-                    style: {
-                        fontSize: '18px'
-                    }
+                    text: null
                 },
                 subtitle: {
-                    text: 'Kliknij na województwo, aby zobaczyć szczegóły'
+                    text: null
                 },
                 mapNavigation: {
                     enabled: true,
@@ -304,13 +466,18 @@
                         verticalAlign: 'bottom'
                     }
                 },
+                legend: {
+                    title: {
+                        text: 'Cena paliwa (PLN/litr)'
+                    }
+                },
                 colorAxis: {
                     min: min,
                     max: max,
                     stops: [
-                        [0, '#00ff00'],   // zielony dla niskich cen
-                        [0.5, '#ffff00'], // żółty dla średnich cen
-                        [1, '#ff0000']    // czerwony dla wysokich cen
+                        [0, '#27ae60'],    // zielony dla niskich cen (success-color)
+                        [0.5, '#f39c12'],  // żółty dla średnich cen (warning-color)
+                        [1, '#e74c3c']     // czerwony dla wysokich cen (danger-color)
                     ],
                     labels: {
                         format: '{value} zł'
@@ -321,7 +488,7 @@
                     name: getFuelName(fuelType),
                     states: {
                         hover: {
-                            color: '#a4edba'
+                            color: '#3498db'  // primary-color
                         }
                     },
                     dataLabels: {
@@ -329,23 +496,15 @@
                         format: '{point.name}'
                     },
                     tooltip: {
-                        pointFormat: '{point.name}: <b>{point.value} zł</b><br/>'
+                        headerFormat: '',
+                        pointFormat: '<b>{point.name}</b><br>{point.name}: <b>{point.value} zł</b>'
                     },
                     nullColor: '#cccccc'
                 }]
             });
-        }
-
-        // Uzyskaj pełną nazwę paliwa
-        function getFuelName(fuelType) {
-            const names = {
-                'PB95': 'Benzyna PB95',
-                'PB98': 'Benzyna PB98',
-                'ON': 'Olej napędowy',
-                'LPG': 'LPG'
-            };
             
-            return names[fuelType] || fuelType;
+            // Aktualizuj informacje o cenach paliw
+            updateFuelInfo(data, fuelType);
         }
 
         // Aktualizuj mapę
@@ -355,8 +514,8 @@
             const [min, max] = calculatePriceRange(fuelData, selectedFuelType);
             const mapData = prepareMapData(fuelData, selectedFuelType);
             
-            // Aktualizuj tytuł
-            chart.setTitle({ text: `Ceny ${getFuelName(selectedFuelType)} w Polsce` });
+            // Aktualizuj tytuł wybranego paliwa
+            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(selectedFuelType)} w Polsce`;
             
             // Aktualizuj oś kolorów
             chart.colorAxis[0].update({
@@ -369,6 +528,9 @@
                 name: getFuelName(selectedFuelType),
                 data: mapData
             });
+            
+            // Aktualizuj informacje o cenach paliw
+            updateFuelInfo(fuelData, selectedFuelType);
         }
 
         // Obsługa zmiany typu paliwa
