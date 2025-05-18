@@ -34,7 +34,7 @@ VOIVODESHIPS = {
     "swietokrzyskie": "https://www.reflex.com.pl/swietokrzyskie-wojewodztwo",
     "warminsko-mazurskie": "https://www.reflex.com.pl/warminsko-mazurskie-wojewodztwo",
     "wielkopolskie": "https://www.reflex.com.pl/wielkopolskie-wojewodztwo",
-    "zachodniopomorskie": "https://www.reflex.com.pl/zachodnipomorskie-wojewodztwo"
+    "zachodniopomorskie": "https://www.reflex.com.pl/zachodniopomorskie-wojewodztwo"
 }
 
 # Nazwy paliw
@@ -70,6 +70,12 @@ def scrape_voivodeship(voivodeship_name, url):
             logger.error(f"Błąd podczas pobierania strony: {response.status_code}")
             return None
         
+        # Zapisujemy HTML do pliku dla celów debugowych
+        debug_dir = "debug"
+        os.makedirs(debug_dir, exist_ok=True)
+        with open(f"{debug_dir}/{voivodeship_name}.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
+        
         soup = BeautifulSoup(response.text, 'html.parser')
         
         # Szukanie daty aktualizacji
@@ -79,25 +85,27 @@ def scrape_voivodeship(voivodeship_name, url):
             date_text = date_header.text.strip()
         
         # Pobieranie cen paliw
-        prices = []
+        prices = [None, None, None, None]  # Inicjalizujemy listę z 4 wartościami None
         
-        # Znajdujemy wszystkie komórki z cenami (wartości w tabeli)
-        price_cells = soup.find_all('td', text=lambda t: t and ('.' in t or ',' in t) and len(t) < 6)
+        # Znajdź wszystkie wiersze tabeli - każdy wiersz reprezentuje inny rodzaj paliwa
+        # Pierwszy obrazek i pierwszy td w każdym wierszu reprezentuje cenę paliwa
+        rows = soup.find_all('tr')
         
-        # Bierzemy pierwsze 4 komórki, które powinny odpowiadać cenom PB95, PB98, ON, LPG
-        for i, cell in enumerate(price_cells[:4]):
-            if i < len(FUEL_TYPES):
-                price = cell.text.strip()
-                # Próbujemy przekonwertować na float, jeśli to możliwe
-                try:
-                    price_value = float(price.replace(',', '.'))
-                    prices.append(price_value)
-                except ValueError:
-                    prices.append(None)
-        
-        # Jeśli mamy mniej niż 4 ceny, uzupełniamy resztę jako None
-        while len(prices) < 4:
-            prices.append(None)
+        fuel_index = 0
+        for row in rows:
+            # Sprawdzamy, czy wiersz zawiera obrazek (logo paliwa)
+            img = row.find('img')
+            if img and fuel_index < 4:  # Ograniczamy do 4 paliw
+                # Znajdź pierwszą komórkę z ceną w tym wierszu
+                cells = row.find_all('td')
+                if cells and len(cells) >= 2:  # Pierwszy cell to obrazek, drugi to cena
+                    price_cell = cells[1]  # Druga komórka zawiera cenę
+                    if price_cell:
+                        price_text = price_cell.get_text(strip=True)
+                        price_value = extract_price(price_text)
+                        prices[fuel_index] = price_value
+                        logger.info(f"Znaleziono cenę dla {FUEL_TYPES[fuel_index]}: {price_value}")
+                fuel_index += 1
         
         # Tworzymy słownik z danymi
         result = {
@@ -111,6 +119,8 @@ def scrape_voivodeship(voivodeship_name, url):
         
     except Exception as e:
         logger.error(f"Wystąpił błąd podczas przetwarzania województwa {voivodeship_name}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return None
 
 
