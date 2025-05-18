@@ -82,7 +82,7 @@ def scrape_voivodeship(voivodeship_name, url):
         prices = []
         
         # Znajdujemy wszystkie komórki z cenami (wartości w tabeli)
-        price_cells = soup.find_all('td', text=lambda t: t and '.' in t and len(t) < 6)
+        price_cells = soup.find_all('td', text=lambda t: t and ('.' in t or ',' in t) and len(t) < 6)
         
         # Bierzemy pierwsze 4 komórki, które powinny odpowiadać cenom PB95, PB98, ON, LPG
         for i, cell in enumerate(price_cells[:4]):
@@ -103,7 +103,7 @@ def scrape_voivodeship(voivodeship_name, url):
         result = {
             "date": date_text,
             "prices": {
-                FUEL_TYPES[i]: prices[i] for i in range(len(FUEL_TYPES)) if i < len(prices)
+                FUEL_TYPES[i]: prices[i] for i in range(len(FUEL_TYPES))
             }
         }
         
@@ -147,51 +147,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
-## Krok 2: Zaktualizuj plik index.html
-
-Teraz zaktualizuj plik `index.html` do wersji używającej biblioteki Leaflet. Otwórz plik index.html do edycji i zastąp go kodem podanym wcześniej.
-
-## Krok 3: Upewnij się, że plik .github/workflows/daily-scrape.yml jest poprawny
-
-Sprawdź i upewnij się, że plik workflow ma poprawną składnię YAML. Otwórz go do edycji i upewnij się, że wygląda tak:
-
-```yaml
-name: Daily Fuel Prices Scraper
-
-on:
-  schedule:
-    # Uruchamiaj codziennie o 06:00 CET (04:00 UTC)
-    - cron: '0 4 * * *'
-  workflow_dispatch: # Umożliwia ręczne uruchomienie
-
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Przyznaj uprawnienia do zapisu zawartości repozytorium
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests beautifulsoup4
-        
-    - name: Run scraper
-      run: python fuel_prices_scraper.py
-      
-    - name: Commit and push if changed
-      run: |
-        git config --global user.name 'GitHub Actions Bot'
-        git config --global user.email 'actions@github.com'
-        git add -A
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update fuel prices data: $(date +'%Y-%m-%d')" && git push)
