@@ -1,0 +1,327 @@
+```html
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Cen Paliw w Polsce</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .map-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+        .map {
+            width: 100%;
+        }
+        .map path {
+            stroke: #333;
+            stroke-width: 0.5;
+            transition: fill 0.3s;
+            cursor: pointer;
+        }
+        .map path:hover {
+            stroke-width: 1.5;
+            stroke: #000;
+        }
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .gradient {
+            height: 20px;
+            width: 300px;
+            background: linear-gradient(to right, #00ff00, #ffff00, #ff0000);
+            margin-bottom: 5px;
+        }
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+        }
+        .update-info {
+            margin-top: 20px;
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mapa Cen Paliw w Polsce</h1>
+        
+        <div class="controls">
+            <label for="fuel-type">Wybierz rodzaj paliwa: </label>
+            <select id="fuel-type">
+                <option value="PB95">Benzyna PB95</option>
+                <option value="PB98">Benzyna PB98</option>
+                <option value="ON">Olej napędowy</option>
+                <option value="LPG">LPG</option>
+            </select>
+        </div>
+
+        <div id="loading" class="loading">Ładowanie danych...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="map-container" class="map-container" style="display: none;">
+            <div id="tooltip" class="tooltip"></div>
+            <svg id="map" class="map" viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Mapa Polski z województwami -->
+                <path id="dolnoslaskie" d="M109,331 L142,364 L179,370 L224,356 L234,403 L208,420 L210,446 L173,448 L137,433 L120,446 L85,445 L66,408 L84,366 z" />
+                <path id="kujawsko-pomorskie" d="M230,205 L275,183 L313,195 L337,174 L349,200 L339,220 L347,255 L322,259 L289,248 L251,262 L226,232 z" />
+                <path id="lubelskie" d="M429,292 L464,273 L493,284 L525,241 L563,245 L580,281 L568,317 L580,346 L548,366 L519,363 L513,393 L473,400 L450,370 L427,364 z" />
+                <path id="lubuskie" d="M84,235 L119,235 L145,257 L156,301 L140,322 L108,331 L84,290 L61,290 z" />
+                <path id="lodzkie" d="M313,275 L348,255 L375,271 L409,269 L427,293 L405,332 L363,337 L347,316 L323,319 z" />
+                <path id="malopolskie" d="M363,408 L373,378 L420,373 L450,372 L472,400 L452,417 L474,452 L457,478 L428,474 L396,454 L369,455 z" />
+                <path id="mazowieckie" d="M348,255 L380,223 L408,214 L431,222 L467,208 L498,232 L493,283 L463,273 L430,292 L409,269 L375,271 z" />
+                <path id="opolskie" d="M210,375 L235,356 L276,372 L296,388 L286,407 L265,425 L236,440 L210,447 z" />
+                <path id="podkarpackie" d="M451,372 L473,401 L513,392 L518,418 L552,427 L545,456 L521,477 L474,453 L452,417 z" />
+                <path id="podlaskie" d="M468,207 L504,178 L548,180 L574,211 L566,242 L525,240 L498,233 z" />
+                <path id="pomorskie" d="M217,88 L253,127 L279,132 L312,122 L336,141 L334,173 L305,195 L275,183 L246,171 L231,126 z" />
+                <path id="slaskie" d="M286,408 L297,388 L318,378 L362,407 L373,379 L344,352 L296,354 L265,425 z" />
+                <path id="swietokrzyskie" d="M390,337 L428,326 L450,369 L419,373 L372,379 L343,352 L363,337 z" />
+                <path id="warminsko-mazurskie" d="M335,140 L370,150 L409,131 L470,149 L467,207 L431,222 L408,214 L380,222 L345,174 z" />
+                <path id="wielkopolskie" d="M157,300 L175,272 L225,232 L252,262 L290,247 L323,260 L313,276 L323,319 L296,352 L235,356 L181,370 L142,364 L108,331 L137,323 z" />
+                <path id="zachodniopomorskie" d="M61,158 L103,133 L137,136 L169,125 L217,88 L230,125 L246,172 L230,204 L178,270 L145,258 L118,234 L83,234 L70,212 z" />
+            </svg>
+        </div>
+        
+        <div class="legend">
+            <p>Cena paliwa (PLN/litr):</p>
+            <div class="gradient"></div>
+            <div class="legend-labels">
+                <span id="min-price">5.00</span>
+                <span id="mid-price">5.50</span>
+                <span id="max-price">6.00</span>
+            </div>
+        </div>
+        
+        <div class="update-info">
+            <p id="update-timestamp">Ostatnia aktualizacja: ładowanie...</p>
+        </div>
+    </div>
+
+    <script>
+        // Mapowanie ID województw do ich nazw w danych
+        const voivodeshipMapping = {
+            "dolnoslaskie": "dolnoslaskie",
+            "kujawsko-pomorskie": "kujawsko-pomorskie",
+            "lubelskie": "lubelskie",
+            "lubuskie": "lubuskie",
+            "lodzkie": "lodzkie",
+            "malopolskie": "malopolskie",
+            "mazowieckie": "mazowieckie",
+            "opolskie": "opolskie",
+            "podkarpackie": "podkarpackie",
+            "podlaskie": "podlaskie",
+            "pomorskie": "pomorskie",
+            "slaskie": "slaskie",
+            "swietokrzyskie": "swietokrzyskie",
+            "warminsko-mazurskie": "warminsko-mazurskie",
+            "wielkopolskie": "wielkopolskie",
+            "zachodniopomorskie": "zachodniopomorskie"
+        };
+
+        // Zmienne globalne
+        let fuelData = null;
+        let selectedFuelType = "PB95";
+        let minPrice = Number.MAX_VALUE;
+        let maxPrice = 0;
+
+        // Pobierz dane o cenach paliw
+        async function fetchFuelPrices() {
+            try {
+                const response = await fetch('data/latest.json');
+                if (!response.ok) {
+                    throw new Error('Nie udało się pobrać danych. Spróbuj ponownie później.');
+                }
+                
+                const data = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('map-container').style.display = 'block';
+                
+                // Aktualizuj informację o czasie aktualizacji
+                document.getElementById('update-timestamp').textContent = 
+                    `Ostatnia aktualizacja: ${data.update_timestamp}`;
+                
+                return data;
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = error.message;
+                return null;
+            }
+        }
+
+        // Oblicz zakres cen dla wybranego typu paliwa
+        function calculatePriceRange(data, fuelType) {
+            minPrice = Number.MAX_VALUE;
+            maxPrice = 0;
+            
+            for (const voivodeship in data.voivodeships) {
+                const price = data.voivodeships[voivodeship].prices[fuelType];
+                if (price !== null && price !== undefined) {
+                    minPrice = Math.min(minPrice, price);
+                    maxPrice = Math.max(maxPrice, price);
+                }
+            }
+            
+            // Zaokrąglamy do 2 miejsc po przecinku
+            minPrice = Math.floor(minPrice * 100) / 100;
+            maxPrice = Math.ceil(maxPrice * 100) / 100;
+            
+            // Aktualizuj etykiety legendy
+            document.getElementById('min-price').textContent = minPrice.toFixed(2);
+            document.getElementById('mid-price').textContent = ((minPrice + maxPrice) / 2).toFixed(2);
+            document.getElementById('max-price').textContent = maxPrice.toFixed(2);
+        }
+
+        // Oblicz kolor dla danej ceny
+        function getPriceColor(price) {
+            if (price === null || price === undefined) {
+                return '#cccccc'; // Szary dla braku danych
+            }
+            
+            // Normalizuj cenę do zakresu 0-1
+            const normalizedPrice = (price - minPrice) / (maxPrice - minPrice);
+            
+            // Przelicz na kolor od zielonego (niskie ceny) przez żółty do czerwonego (wysokie ceny)
+            if (normalizedPrice < 0.5) {
+                // Od zielonego do żółtego
+                const r = Math.floor(normalizedPrice * 2 * 255);
+                return `rgb(${r}, 255, 0)`;
+            } else {
+                // Od żółtego do czerwonego
+                const g = Math.floor((1 - (normalizedPrice - 0.5) * 2) * 255);
+                return `rgb(255, ${g}, 0)`;
+            }
+        }
+
+        // Aktualizuj mapę na podstawie danych
+        function updateMap(data, fuelType) {
+            calculatePriceRange(data, fuelType);
+            
+            for (const voivodeshipId in voivodeshipMapping) {
+                const voivodeshipName = voivodeshipMapping[voivodeshipId];
+                const voivodeshipElement = document.getElementById(voivodeshipId);
+                
+                if (voivodeshipElement && data.voivodeships[voivodeshipName]) {
+                    const price = data.voivodeships[voivodeshipName].prices[fuelType];
+                    const color = getPriceColor(price);
+                    voivodeshipElement.style.fill = color;
+                } else {
+                    // Jeśli nie ma danych dla województwa
+                    if (voivodeshipElement) {
+                        voivodeshipElement.style.fill = '#cccccc';
+                    }
+                }
+            }
+        }
+
+        // Obsługa najechania myszką na województwo
+        function setupTooltips() {
+            const tooltip = document.getElementById('tooltip');
+            const mapContainer = document.getElementById('map-container');
+            
+            for (const voivodeshipId in voivodeshipMapping) {
+                const voivodeshipElement = document.getElementById(voivodeshipId);
+                if (voivodeshipElement) {
+                    voivodeshipElement.addEventListener('mousemove', (e) => {
+                        const voivodeshipName = voivodeshipMapping[voivodeshipId];
+                        if (fuelData && fuelData.voivodeships[voivodeshipName]) {
+                            const price = fuelData.voivodeships[voivodeshipName].prices[selectedFuelType];
+                            const formattedPrice = price !== null && price !== undefined ? price.toFixed(2) + ' PLN/l' : 'Brak danych';
+                            
+                            // Dostosuj nazwę województwa do wyświetlenia
+                            let displayName = voivodeshipName.charAt(0).toUpperCase() + voivodeshipName.slice(1);
+                            displayName = displayName.replace(/-/g, '-');
+                            
+                            tooltip.innerHTML = `<strong>${displayName}</strong><br>${selectedFuelType}: ${formattedPrice}`;
+                            tooltip.style.opacity = '1';
+                            
+                            // Pozycjonowanie tooltipa
+                            const rect = mapContainer.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            
+                            tooltip.style.left = `${x + 15}px`;
+                            tooltip.style.top = `${y - 15}px`;
+                        }
+                    });
+                    
+                    voivodeshipElement.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                    });
+                }
+            }
+        }
+
+        // Główna funkcja inicjalizująca
+        async function initialize() {
+            // Pobierz dane
+            fuelData = await fetchFuelPrices();
+            if (!fuelData) return;
+            
+            // Ustaw dropdown z typami paliw
+            const fuelTypeSelect = document.getElementById('fuel-type');
+            fuelTypeSelect.addEventListener('change', (e) => {
+                selectedFuelType = e.target.value;
+                updateMap(fuelData, selectedFuelType);
+            });
+            
+            // Aktualizuj mapę z początkowymi danymi
+            updateMap(fuelData, selectedFuelType);
+            
+            // Ustaw tooltips
+            setupTooltips();
+        }
+
+        // Uruchom po załadowaniu strony
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>
+```
