@@ -1,0 +1,149 @@
+{
+  "update_timestamp": "2025-05-18 20:35:59",
+  "voivodeships": {
+    "dolnoslaskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.72,
+        "PB98": -0.04,
+        "ON": 6.53,
+        "LPG": -0.02
+      }
+    },
+    "kujawsko-pomorskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.83,
+        "PB98": -0.06,
+        "ON": 6.65,
+        "LPG": -0.06
+      }
+    },
+    "lubelskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.84,
+        "PB98": -0.08,
+        "ON": 6.66,
+        "LPG": -0.06
+      }
+    },
+    "lubuskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.68,
+        "PB98": -0.05,
+        "ON": 6.36,
+        "LPG": -0.08
+      }
+    },
+    "lodzkie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.68,
+        "PB98": -0.03,
+        "ON": 6.4,
+        "LPG": -0.04
+      }
+    },
+    "malopolskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.64,
+        "PB98": -0.04,
+        "ON": 6.44,
+        "LPG": -0.04
+      }
+    },
+    "mazowieckie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.92,
+        "PB98": -0.05,
+        "ON": 6.71,
+        "LPG": -0.05
+      }
+    },
+    "opolskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.77,
+        "PB98": -0.02,
+        "ON": 6.52,
+        "LPG": -0.15
+      }
+    },
+    "podkarpackie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.66,
+        "PB98": -0.02,
+        "ON": 6.45,
+        "LPG": -0.06
+      }
+    },
+    "podlaskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.88,
+        "PB98": -0.04,
+        "ON": 6.66,
+        "LPG": -0.02
+      }
+    },
+    "pomorskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.74,
+        "PB98": -0.04,
+        "ON": 6.53,
+        "LPG": -0.05
+      }
+    },
+    "slaskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.68,
+        "PB98": -0.06,
+        "ON": 6.45,
+        "LPG": -0.09
+      }
+    },
+    "swietokrzyskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.77,
+        "PB98": -0.1,
+        "ON": 6.45,
+        "LPG": -0.09
+      }
+    },
+    "warminsko-mazurskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.7,
+        "PB98": -0.05,
+        "ON": 6.37,
+        "LPG": -0.04
+      }
+    },
+    "wielkopolskie": {
+      "date": "2025-05-15",
+      "prices": {
+        "PB95": 5.74,
+        "PB98": -0.07,
+        "ON": 6.55,
+        "LPG": -0.04
+      }
+    },
+    "zachodniopomorskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    }
+  }
+}
