@@ -7,20 +7,35 @@
     <script src="https://code.highcharts.com/maps/highmaps.js"></script>
     <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/mapdata/countries/pl/pl-all.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --background-color: #f8f9fa;
+            /* Nowoczesna paleta kolorów */
+            --primary-gradient-start: #4776E6;
+            --primary-gradient-end: #8E54E9;
+            --secondary-color: #2d3748;
+            --background-color: #f7fafc;
             --card-color: #ffffff;
-            --text-color: #333333;
-            --light-gray: #e0e0e0;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
+            --text-color: #1a202c;
+            --text-muted: #718096;
+            --light-gray: #e2e8f0;
+            --success-color: #38b2ac;
+            --success-gradient-start: #38b2ac;
+            --success-gradient-end: #4fd1c5;
+            --warning-color: #f6ad55;
+            --warning-gradient-start: #f6ad55;
+            --warning-gradient-end: #ed8936;
+            --danger-color: #f56565;
+            --danger-gradient-start: #f56565;
+            --danger-gradient-end: #e53e3e;
+            
+            /* Efekty */
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.03);
+            --card-hover-shadow: 0 14px 28px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.06);
+            --button-shadow: 0 4px 6px rgba(71, 118, 230, 0.1);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -30,7 +45,7 @@
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -45,31 +60,58 @@
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
             color: white;
-            padding: 2rem 0;
+            padding: 3rem 0;
             text-align: center;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 20px rgba(142, 84, 233, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        header .container {
+            position: relative;
+            z-index: 2;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             font-size: 1.2rem;
-            opacity: 0.9;
+            opacity: 0.92;
+            font-weight: 300;
+            letter-spacing: 0.5px;
         }
 
         .card {
             background-color: var(--card-color);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            padding: 1.8rem;
+            margin-bottom: 2.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
         }
 
         .controls {
@@ -77,93 +119,149 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         select {
-            padding: 0.8rem 1.5rem;
+            padding: 0.9rem 1.8rem;
             border: 1px solid var(--light-gray);
-            border-radius: var(--radius);
+            border-radius: var(--radius-sm);
             background-color: var(--card-color);
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             flex-grow: 1;
             max-width: 300px;
+            box-shadow: var(--button-shadow);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='%23718096'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         select:hover, select:focus {
-            border-color: var(--primary-color);
+            border-color: var(--primary-gradient-start);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.15);
+        }
+
+        #update-timestamp {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            background: linear-gradient(to right, rgba(71, 118, 230, 0.08), rgba(142, 84, 233, 0.05));
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
         }
 
         .map-container {
             height: 600px;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            background-color: white;
+            border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .fuel-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .fuel-card {
             background-color: var(--card-color);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            padding: 1.8rem;
             text-align: center;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .fuel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--success-gradient-start), var(--success-gradient-end));
         }
 
         .fuel-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-6px);
+            box-shadow: var(--card-hover-shadow);
         }
 
         .fuel-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.7rem;
             color: var(--secondary-color);
+            font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .fuel-card .price {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            line-height: 1.1;
         }
 
         .fuel-card .change {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
             display: inline-block;
+            transition: var(--transition);
         }
 
         .decrease {
-            background-color: rgba(39, 174, 96, 0.1);
+            background: linear-gradient(135deg, rgba(56, 178, 172, 0.1), rgba(79, 209, 197, 0.1));
             color: var(--success-color);
         }
 
         .increase {
-            background-color: rgba(231, 76, 60, 0.1);
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(229, 62, 62, 0.1));
             color: var(--danger-color);
         }
 
         .info-footer {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--text-muted);
             text-align: center;
-            padding: 1rem;
+            padding: 1.5rem;
             background-color: var(--card-color);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .info-footer::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            opacity: 0.5;
         }
 
         .loading {
@@ -172,32 +270,66 @@
             align-items: center;
             height: 300px;
             font-size: 1.2rem;
-            color: #666;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            margin-left: 15px;
+            border: 2px solid var(--light-gray);
+            border-top-color: var(--primary-gradient-start);
+            border-radius: 50%;
+            animation: loading 1s linear infinite;
+        }
+
+        @keyframes loading {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .error {
-            background-color: rgba(231, 76, 60, 0.1);
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.05), rgba(229, 62, 62, 0.05));
             color: var(--danger-color);
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: var(--radius);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             text-align: center;
+            border-left: 4px solid var(--danger-color);
         }
 
         .selected-fuel-title {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             font-weight: 600;
             color: var(--secondary-color);
             text-align: center;
+            font-size: 1.5rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .selected-fuel-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+            border-radius: 3px;
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 10px;
+                padding: 12px;
             }
             
             h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             
             .subtitle {
@@ -214,6 +346,10 @@
             
             .map-container {
                 height: 400px;
+            }
+
+            .fuel-card .price {
+                font-size: 2rem;
             }
         }
     </style>
@@ -433,130 +569,3 @@
                 card.innerHTML = `
                     <h3>${polishNames[voivodeship.name] || voivodeship.name}</h3>
                     <div class="price">${voivodeship.price.toFixed(2)} zł</div>
-                    <div class="change decrease">Najtańsze w kraju</div>
-                `;
-                
-                container.appendChild(card);
-            }
-        }
-
-        // Utworzenie mapy
-        function createMap(data, fuelType) {
-            const [min, max] = calculatePriceRange(data, fuelType);
-            const mapData = prepareMapData(data, fuelType);
-            
-            // Aktualizuj tytuł wybranego paliwa
-            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(fuelType)} w Polsce`;
-            
-            // Inicjalizacja mapy Highcharts
-            chart = Highcharts.mapChart('map-container', {
-                chart: {
-                    map: 'countries/pl/pl-all',
-                    backgroundColor: 'transparent'
-                },
-                title: {
-                    text: null
-                },
-                subtitle: {
-                    text: null
-                },
-                mapNavigation: {
-                    enabled: true,
-                    buttonOptions: {
-                        verticalAlign: 'bottom'
-                    }
-                },
-                legend: {
-                    title: {
-                        text: 'Cena paliwa (PLN/litr)'
-                    }
-                },
-                colorAxis: {
-                    min: min,
-                    max: max,
-                    stops: [
-                        [0, '#27ae60'],    // zielony dla niskich cen (success-color)
-                        [0.5, '#f39c12'],  // żółty dla średnich cen (warning-color)
-                        [1, '#e74c3c']     // czerwony dla wysokich cen (danger-color)
-                    ],
-                    labels: {
-                        format: '{value} zł'
-                    }
-                },
-                series: [{
-                    data: mapData,
-                    name: getFuelName(fuelType),
-                    states: {
-                        hover: {
-                            color: '#3498db'  // primary-color
-                        }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.name}'
-                    },
-                    tooltip: {
-                        headerFormat: '',
-                        pointFormat: '<b>{point.name}</b><br>{point.name}: <b>{point.value} zł</b>'
-                    },
-                    nullColor: '#cccccc'
-                }]
-            });
-            
-            // Aktualizuj informacje o cenach paliw
-            updateFuelInfo(data, fuelType);
-        }
-
-        // Aktualizuj mapę
-        function updateMap() {
-            if (!fuelData || !chart) return;
-            
-            const [min, max] = calculatePriceRange(fuelData, selectedFuelType);
-            const mapData = prepareMapData(fuelData, selectedFuelType);
-            
-            // Aktualizuj tytuł wybranego paliwa
-            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(selectedFuelType)} w Polsce`;
-            
-            // Aktualizuj oś kolorów
-            chart.colorAxis[0].update({
-                min: min,
-                max: max
-            });
-            
-            // Aktualizuj dane
-            chart.series[0].update({
-                name: getFuelName(selectedFuelType),
-                data: mapData
-            });
-            
-            // Aktualizuj informacje o cenach paliw
-            updateFuelInfo(fuelData, selectedFuelType);
-        }
-
-        // Obsługa zmiany typu paliwa
-        function setupFuelTypeSelect() {
-            const fuelTypeSelect = document.getElementById('fuel-type');
-            fuelTypeSelect.addEventListener('change', (e) => {
-                selectedFuelType = e.target.value;
-                updateMap();
-            });
-        }
-
-        // Główna funkcja inicjalizująca
-        async function initialize() {
-            // Pobierz dane
-            fuelData = await fetchFuelPrices();
-            if (!fuelData) return;
-            
-            // Utwórz mapę
-            createMap(fuelData, selectedFuelType);
-            
-            // Ustaw obsługę zmiany typu paliwa
-            setupFuelTypeSelect();
-        }
-
-        // Uruchom po załadowaniu strony
-        document.addEventListener('DOMContentLoaded', initialize);
-    </script>
-</body>
-</html>
