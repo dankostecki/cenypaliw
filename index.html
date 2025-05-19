@@ -7,35 +7,46 @@
     <script src="https://code.highcharts.com/maps/highmaps.js"></script>
     <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/mapdata/countries/pl/pl-all.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            /* Nowoczesna paleta kolorów */
-            --primary-gradient-start: #4776E6;
-            --primary-gradient-end: #8E54E9;
-            --secondary-color: #2d3748;
-            --background-color: #f7fafc;
-            --card-color: #ffffff;
-            --text-color: #1a202c;
-            --text-muted: #718096;
-            --light-gray: #e2e8f0;
-            --success-color: #38b2ac;
-            --success-gradient-start: #38b2ac;
-            --success-gradient-end: #4fd1c5;
-            --warning-color: #f6ad55;
-            --warning-gradient-start: #f6ad55;
-            --warning-gradient-end: #ed8936;
-            --danger-color: #f56565;
-            --danger-gradient-start: #f56565;
-            --danger-gradient-end: #e53e3e;
+            /* Jeszcze bardziej nowoczesna paleta kolorów */
+            --primary-light: #edf2ff;
+            --primary-medium: #bac8ff;
+            --primary-color: #5c7cfa;
+            --primary-dark: #4263eb;
+            
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b;
+            --neutral-900: #0f172a;
+            
+            --success-light: #c3fae8;
+            --success-color: #12b886;
+            --success-dark: #0ca678;
+            
+            --warning-light: #fff3bf;
+            --warning-color: #fab005;
+            --warning-dark: #f08c00;
+            
+            --danger-light: #ffe3e3;
+            --danger-color: #fa5252;
+            --danger-dark: #e03131;
             
             /* Efekty */
-            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 6px 6px rgba(0, 0, 0, 0.03);
-            --card-hover-shadow: 0 14px 28px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.06);
-            --button-shadow: 0 4px 6px rgba(71, 118, 230, 0.1);
-            --radius: 16px;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.03), 0 4px 6px rgba(0, 0, 0, 0.05);
             --radius-sm: 8px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -45,9 +56,9 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--neutral-50);
+            color: var(--neutral-800);
             line-height: 1.6;
             padding: 0;
             margin: 0;
@@ -60,226 +71,258 @@
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            margin-bottom: 2.5rem;
-            box-shadow: 0 4px 20px rgba(142, 84, 233, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            z-index: 1;
-        }
-
-        header .container {
-            position: relative;
-            z-index: 2;
+            background-color: white;
+            color: var(--neutral-800);
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            border-bottom: 1px solid var(--neutral-200);
         }
 
         h1 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            color: var(--neutral-800);
             letter-spacing: -0.5px;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.92;
-            font-weight: 300;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
+            color: var(--neutral-500);
+            font-weight: 400;
         }
 
         .card {
-            background-color: var(--card-color);
-            border-radius: var(--radius);
+            background-color: white;
+            border-radius: var(--radius-md);
             box-shadow: var(--card-shadow);
-            padding: 1.8rem;
-            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
             transition: var(--transition);
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--neutral-200);
         }
 
         .card:hover {
             box-shadow: var(--card-hover-shadow);
         }
 
-        .controls {
+        .segmented-control {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            background-color: var(--neutral-100);
+            border-radius: var(--radius-full);
+            padding: 0.3rem;
+            margin-bottom: 1rem;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        select {
-            padding: 0.9rem 1.8rem;
-            border: 1px solid var(--light-gray);
-            border-radius: var(--radius-sm);
-            background-color: var(--card-color);
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
+        .segment {
+            flex: 1;
+            text-align: center;
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
             font-weight: 500;
+            color: var(--neutral-600);
             cursor: pointer;
+            border-radius: var(--radius-full);
             transition: var(--transition);
-            flex-grow: 1;
-            max-width: 300px;
-            box-shadow: var(--button-shadow);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'%3E%3Cpath fill='none' d='M0 0h24v24H0z'/%3E%3Cpath d='M12 15l-4.243-4.243 1.415-1.414L12 12.172l2.828-2.829 1.415 1.414z' fill='%23718096'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+            user-select: none;
         }
 
-        select:hover, select:focus {
-            border-color: var(--primary-gradient-start);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(71, 118, 230, 0.15);
+        .segment:hover {
+            color: var(--primary-dark);
+        }
+
+        .segment.active {
+            background-color: white;
+            color: var(--primary-dark);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         #update-timestamp {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            background: linear-gradient(to right, rgba(71, 118, 230, 0.08), rgba(142, 84, 233, 0.05));
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
+            text-align: center;
+            color: var(--neutral-500);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .price-indicators {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .price-circle:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .circle-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--neutral-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .circle-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .circle-price .unit {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-left: 0.2rem;
+            color: var(--neutral-500);
+        }
+
+        .circle-location {
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .lowest-circle .circle-price {
+            color: var(--success-color);
+        }
+
+        .lowest-circle {
+            border-top: 3px solid var(--success-color);
+        }
+
+        .average-circle .circle-price {
+            color: var(--primary-color);
+        }
+
+        .average-circle {
+            border-top: 3px solid var(--primary-color);
+        }
+
+        .highest-circle .circle-price {
+            color: var(--danger-color);
+        }
+
+        .highest-circle {
+            border-top: 3px solid var(--danger-color);
         }
 
         .map-container {
-            height: 600px;
-            margin-bottom: 2.5rem;
-            border-radius: var(--radius);
+            height: 500px;
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-md);
             overflow: hidden;
             box-shadow: var(--card-shadow);
             background-color: white;
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--neutral-200);
         }
 
         .fuel-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .fuel-card {
-            background-color: var(--card-color);
-            border-radius: var(--radius);
+            background-color: white;
+            border-radius: var(--radius-md);
             box-shadow: var(--card-shadow);
-            padding: 1.8rem;
+            padding: 1.5rem;
             text-align: center;
             transition: var(--transition);
             overflow: hidden;
             position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.02);
-        }
-
-        .fuel-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--success-gradient-start), var(--success-gradient-end));
+            border: 1px solid var(--neutral-200);
         }
 
         .fuel-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-3px);
             box-shadow: var(--card-hover-shadow);
         }
 
         .fuel-card h3 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 0.7rem;
-            color: var(--secondary-color);
+            color: var(--neutral-700);
             font-weight: 600;
-            letter-spacing: -0.3px;
         }
 
         .fuel-card .price {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 0.8rem;
+            color: var(--primary-color);
+            margin-bottom: 0.7rem;
             line-height: 1.1;
         }
 
         .fuel-card .change {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-weight: 500;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
+            padding: 0.3rem 0.8rem;
+            border-radius: var(--radius-full);
             display: inline-block;
             transition: var(--transition);
         }
 
         .decrease {
-            background: linear-gradient(135deg, rgba(56, 178, 172, 0.1), rgba(79, 209, 197, 0.1));
-            color: var(--success-color);
+            background-color: var(--success-light);
+            color: var(--success-dark);
         }
 
         .increase {
-            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(229, 62, 62, 0.1));
-            color: var(--danger-color);
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
         }
 
         .info-footer {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            font-size: 0.85rem;
+            color: var(--neutral-500);
             text-align: center;
             padding: 1.5rem;
-            background-color: var(--card-color);
-            border-radius: var(--radius);
+            background-color: white;
+            border-radius: var(--radius-md);
             box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0, 0, 0, 0.02);
-        }
-
-        .info-footer::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            opacity: 0.5;
+            border: 1px solid var(--neutral-200);
         }
 
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 300px;
-            font-size: 1.2rem;
-            color: var(--text-muted);
+            height: 200px;
+            font-size: 1rem;
+            color: var(--neutral-500);
         }
 
         .loading::after {
             content: "";
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             margin-left: 15px;
-            border: 2px solid var(--light-gray);
-            border-top-color: var(--primary-gradient-start);
+            border: 2px solid var(--neutral-200);
+            border-top-color: var(--primary-color);
             border-radius: 50%;
             animation: loading 1s linear infinite;
         }
@@ -291,36 +334,13 @@
         }
 
         .error {
-            background: linear-gradient(135deg, rgba(245, 101, 101, 0.05), rgba(229, 62, 62, 0.05));
-            color: var(--danger-color);
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
             padding: 1.5rem;
-            border-radius: var(--radius);
-            margin-bottom: 2.5rem;
-            text-align: center;
-            border-left: 4px solid var(--danger-color);
-        }
-
-        .selected-fuel-title {
+            border-radius: var(--radius-md);
             margin-bottom: 1.5rem;
-            font-weight: 600;
-            color: var(--secondary-color);
             text-align: center;
-            font-size: 1.5rem;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .selected-fuel-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
-            border-radius: 3px;
+            border-left: 3px solid var(--danger-color);
         }
 
         @media (max-width: 768px) {
@@ -329,27 +349,19 @@
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
             
             .subtitle {
-                font-size: 1rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
-            
-            select {
-                max-width: 100%;
+                font-size: 0.9rem;
             }
             
             .map-container {
-                height: 400px;
+                height: 350px;
             }
 
-            .fuel-card .price {
-                font-size: 2rem;
+            .price-indicators {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -357,22 +369,20 @@
 <body>
     <header>
         <div class="container">
-            <h1>Ceny Paliw w Polsce</h1>
-            <p class="subtitle">Aktualne dane ze wszystkich województw</p>
+            <h1>Monitor Cen Paliw</h1>
+            <p class="subtitle">Aktualne dane z całej Polski</p>
         </div>
     </header>
 
     <div class="container">
         <div class="card">
-            <div class="controls">
-                <select id="fuel-type">
-                    <option value="PB95">Benzyna PB95</option>
-                    <option value="PB98">Benzyna PB98</option>
-                    <option value="ON">Olej napędowy</option>
-                    <option value="LPG">LPG</option>
-                </select>
-                <p id="update-timestamp">Ostatnia aktualizacja: ładowanie...</p>
+            <div class="segmented-control">
+                <div class="segment active" data-fuel="PB95">Benzyna 95</div>
+                <div class="segment" data-fuel="PB98">Benzyna 98</div>
+                <div class="segment" data-fuel="ON">Diesel</div>
+                <div class="segment" data-fuel="LPG">LPG</div>
             </div>
+            <div id="update-timestamp">Ostatnia aktualizacja: ładowanie...</div>
         </div>
 
         <div id="loading" class="loading">
@@ -381,7 +391,23 @@
         
         <div id="error" class="error" style="display: none;"></div>
         
-        <h2 id="selected-fuel-title" class="selected-fuel-title">Benzyna PB95</h2>
+        <div id="price-indicators" class="price-indicators" style="display: none;">
+            <div class="price-circle lowest-circle">
+                <div class="circle-label">Najniższa cena</div>
+                <div class="circle-price" id="lowest-price">0.00<span class="unit">zł/l</span></div>
+                <div class="circle-location" id="lowest-location">Województwo</div>
+            </div>
+            <div class="price-circle average-circle">
+                <div class="circle-label">Średnia krajowa</div>
+                <div class="circle-price" id="average-price">0.00<span class="unit">zł/l</span></div>
+                <div class="circle-location">Cała Polska</div>
+            </div>
+            <div class="price-circle highest-circle">
+                <div class="circle-label">Najwyższa cena</div>
+                <div class="circle-price" id="highest-price">0.00<span class="unit">zł/l</span></div>
+                <div class="circle-location" id="highest-location">Województwo</div>
+            </div>
+        </div>
         
         <div id="map-container" class="map-container" style="display: none;"></div>
         
@@ -444,8 +470,6 @@
         // Zmienne globalne
         let fuelData = null;
         let selectedFuelType = "PB95";
-        let minPrice = Number.MAX_VALUE;
-        let maxPrice = 0;
         let chart = null;
 
         // Pobierz dane o cenach paliw
@@ -461,6 +485,7 @@
                 document.getElementById('map-container').style.display = 'block';
                 document.getElementById('fuel-info').style.display = 'grid';
                 document.getElementById('info-footer').style.display = 'block';
+                document.getElementById('price-indicators').style.display = 'grid';
                 
                 // Aktualizuj informację o czasie aktualizacji
                 document.getElementById('update-timestamp').textContent = 
@@ -475,30 +500,47 @@
             }
         }
 
-        // Oblicz zakres cen dla wybranego typu paliwa
-        function calculatePriceRange(data, fuelType) {
-            minPrice = Number.MAX_VALUE;
-            maxPrice = 0;
+        // Analiza danych cenowych dla wybranego typu paliwa
+        function analyzePrices(data, fuelType) {
+            let prices = [];
+            let minPrice = Number.MAX_VALUE;
+            let maxPrice = 0;
+            let minLocation = '';
+            let maxLocation = '';
             
             for (const voivodeship in data.voivodeships) {
                 const price = data.voivodeships[voivodeship].prices[fuelType];
                 if (price !== null && price !== undefined) {
-                    minPrice = Math.min(minPrice, price);
-                    maxPrice = Math.max(maxPrice, price);
+                    prices.push(price);
+                    
+                    if (price < minPrice) {
+                        minPrice = price;
+                        minLocation = voivodeship;
+                    }
+                    
+                    if (price > maxPrice) {
+                        maxPrice = price;
+                        maxLocation = voivodeship;
+                    }
                 }
             }
             
-            // Upewnij się, że mamy sensowny zakres
-            if (minPrice === Number.MAX_VALUE || maxPrice === 0 || minPrice === maxPrice) {
-                minPrice = 5.0;
-                maxPrice = 6.0;
-            } else {
-                // Zaokrąglamy do 2 miejsc po przecinku i dodajemy margines
-                minPrice = Math.floor(minPrice * 100) / 100;
-                maxPrice = Math.ceil(maxPrice * 100) / 100;
+            // Oblicz średnią
+            let avgPrice = 0;
+            if (prices.length > 0) {
+                avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
             }
             
-            return [minPrice, maxPrice];
+            // Zaokrąglij do 2 miejsc po przecinku
+            avgPrice = Math.round(avgPrice * 100) / 100;
+            
+            return {
+                min: minPrice,
+                max: maxPrice,
+                avg: avgPrice,
+                minLocation: minLocation,
+                maxLocation: maxLocation
+            };
         }
 
         // Przygotuj dane do wyświetlenia na mapie
@@ -532,13 +574,34 @@
         // Uzyskaj pełną nazwę paliwa
         function getFuelName(fuelType) {
             const names = {
-                'PB95': 'Benzyna PB95',
-                'PB98': 'Benzyna PB98',
+                'PB95': 'Benzyna 95',
+                'PB98': 'Benzyna 98',
                 'ON': 'Olej napędowy',
-                'LPG': 'LPG (Autogaz)'
+                'LPG': 'Autogaz LPG'
             };
             
             return names[fuelType] || fuelType;
+        }
+
+        // Aktualizuj wskaźniki cenowe
+        function updatePriceIndicators(data, fuelType) {
+            const priceAnalysis = analyzePrices(data, fuelType);
+            
+            // Aktualizuj najniższą cenę
+            document.getElementById('lowest-price').innerHTML = 
+                priceAnalysis.min.toFixed(2) + '<span class="unit">zł/l</span>';
+            document.getElementById('lowest-location').textContent = 
+                polishNames[priceAnalysis.minLocation] || priceAnalysis.minLocation;
+                
+            // Aktualizuj średnią cenę
+            document.getElementById('average-price').innerHTML = 
+                priceAnalysis.avg.toFixed(2) + '<span class="unit">zł/l</span>';
+                
+            // Aktualizuj najwyższą cenę
+            document.getElementById('highest-price').innerHTML = 
+                priceAnalysis.max.toFixed(2) + '<span class="unit">zł/l</span>';
+            document.getElementById('highest-location').textContent = 
+                polishNames[priceAnalysis.maxLocation] || priceAnalysis.maxLocation;
         }
 
         // Aktualizuj informacje o cenach paliw dla poszczególnych województw
@@ -578,11 +641,8 @@
 
         // Utworzenie mapy
         function createMap(data, fuelType) {
-            const [min, max] = calculatePriceRange(data, fuelType);
+            const priceAnalysis = analyzePrices(data, fuelType);
             const mapData = prepareMapData(data, fuelType);
-            
-            // Aktualizuj tytuł wybranego paliwa
-            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(fuelType)} w Polsce`;
             
             // Inicjalizacja mapy Highcharts
             chart = Highcharts.mapChart('map-container', {
@@ -590,7 +650,7 @@
                     map: 'countries/pl/pl-all',
                     backgroundColor: 'transparent',
                     style: {
-                        fontFamily: 'Inter, sans-serif'
+                        fontFamily: 'Plus Jakarta Sans, sans-serif'
                     }
                 },
                 title: {
@@ -604,20 +664,20 @@
                     buttonOptions: {
                         verticalAlign: 'bottom',
                         style: {
-                            color: '#718096'
+                            color: var(--neutral-500)
                         },
                         theme: {
                             fill: 'white',
                             'stroke-width': 1,
-                            stroke: '#e2e8f0',
+                            stroke: var(--neutral-200),
                             r: 4,
                             states: {
                                 hover: {
-                                    fill: '#edf2f7'
+                                    fill: var(--neutral-100)
                                 },
                                 select: {
-                                    stroke: '#4776E6',
-                                    fill: '#edf2f7'
+                                    stroke: var(--primary-color),
+                                    fill: var(--neutral-100)
                                 }
                             }
                         }
@@ -627,24 +687,24 @@
                     title: {
                         text: 'Cena paliwa (PLN/litr)',
                         style: {
-                            color: '#2d3748',
+                            color: var(--neutral-700),
                             fontWeight: '500'
                         }
                     },
                     backgroundColor: 'rgba(255, 255, 255, 0.7)'
                 },
                 colorAxis: {
-                    min: min,
-                    max: max,
+                    min: priceAnalysis.min,
+                    max: priceAnalysis.max,
                     stops: [
-                        [0, '#38b2ac'],    // zielony dla niskich cen
-                        [0.5, '#f6ad55'],  // żółty dla średnich cen
-                        [1, '#f56565']     // czerwony dla wysokich cen
+                        [0, var(--success-color)],    // zielony dla niskich cen
+                        [0.5, var(--warning-color)],  // żółty dla średnich cen
+                        [1, var(--danger-color)]      // czerwony dla wysokich cen
                     ],
                     labels: {
                         format: '{value} zł',
                         style: {
-                            color: '#718096'
+                            color: var(--neutral-600)
                         }
                     }
                 },
@@ -653,23 +713,23 @@
                     name: getFuelName(fuelType),
                     states: {
                         hover: {
-                            color: '#4776E6'  // primary-color
+                            color: var(--primary-color)
                         }
                     },
                     dataLabels: {
                         enabled: true,
                         format: '{point.name}',
                         style: {
-                            color: '#2d3748',
+                            color: var(--neutral-800),
                             textOutline: '1px solid white',
                             fontWeight: '500'
                         }
                     },
                     tooltip: {
                         headerFormat: '',
-                        pointFormat: '<span style="font-size: 1.1em; font-weight: bold;">{point.name}</span><br><span style="font-size: 1.1em; font-weight: bold; color: #4776E6;">{point.value} zł</span>',
+                        pointFormat: '<span style="font-size: 1rem; font-weight: 600;">{point.name}</span><br><span style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color);">{point.value} zł</span>',
                         style: {
-                            color: '#2d3748'
+                            color: var(--neutral-800)
                         },
                         backgroundColor: 'rgba(255, 255, 255, 0.96)',
                         borderWidth: 0,
@@ -678,28 +738,28 @@
                     },
                     borderColor: 'rgba(255, 255, 255, 0.5)',
                     borderWidth: 0.5,
-                    nullColor: '#edf2f7'
+                    nullColor: var(--neutral-100)
                 }]
             });
+            
+            // Aktualizuj wskaźniki cenowe
+            updatePriceIndicators(data, fuelType);
             
             // Aktualizuj informacje o cenach paliw
             updateFuelInfo(data, fuelType);
         }
 
-        // Aktualizuj mapę
-        function updateMap() {
+        // Aktualizuj mapę i powiązane dane
+        function updateMapAndData() {
             if (!fuelData || !chart) return;
             
-            const [min, max] = calculatePriceRange(fuelData, selectedFuelType);
+            const priceAnalysis = analyzePrices(fuelData, selectedFuelType);
             const mapData = prepareMapData(fuelData, selectedFuelType);
-            
-            // Aktualizuj tytuł wybranego paliwa
-            document.getElementById('selected-fuel-title').textContent = `Ceny ${getFuelName(selectedFuelType)} w Polsce`;
             
             // Aktualizuj oś kolorów
             chart.colorAxis[0].update({
-                min: min,
-                max: max
+                min: priceAnalysis.min,
+                max: priceAnalysis.max
             });
             
             // Aktualizuj dane
@@ -708,16 +768,30 @@
                 data: mapData
             });
             
+            // Aktualizuj wskaźniki cenowe
+            updatePriceIndicators(fuelData, selectedFuelType);
+            
             // Aktualizuj informacje o cenach paliw
             updateFuelInfo(fuelData, selectedFuelType);
         }
 
-        // Obsługa zmiany typu paliwa
-        function setupFuelTypeSelect() {
-            const fuelTypeSelect = document.getElementById('fuel-type');
-            fuelTypeSelect.addEventListener('change', (e) => {
-                selectedFuelType = e.target.value;
-                updateMap();
+        // Obsługa zmiany typu paliwa za pomocą segmentowanej kontrolki
+        function setupSegmentedControl() {
+            const segments = document.querySelectorAll('.segment');
+            segments.forEach(segment => {
+                segment.addEventListener('click', (e) => {
+                    // Usuń klasę active ze wszystkich segmentów
+                    segments.forEach(s => s.classList.remove('active'));
+                    
+                    // Dodaj klasę active do klikniętego segmentu
+                    e.target.classList.add('active');
+                    
+                    // Zaktualizuj wybrany typ paliwa
+                    selectedFuelType = e.target.dataset.fuel;
+                    
+                    // Zaktualizuj dane
+                    updateMapAndData();
+                });
             });
         }
 
@@ -731,7 +805,7 @@
             createMap(fuelData, selectedFuelType);
             
             // Ustaw obsługę zmiany typu paliwa
-            setupFuelTypeSelect();
+            setupSegmentedControl();
         }
 
         // Uruchom po załadowaniu strony
