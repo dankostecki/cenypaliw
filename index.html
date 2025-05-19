@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            /* Jeszcze bardziej nowoczesna paleta kolorów */
+            /* Nowoczesna paleta kolorów */
             --primary-light: #edf2ff;
             --primary-medium: #bac8ff;
             --primary-color: #5c7cfa;
@@ -343,6 +343,29 @@
             border-left: 3px solid var(--danger-color);
         }
 
+        .debug-info {
+            background-color: var(--warning-light);
+            color: var(--warning-dark);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            display: none;
+        }
+
+        .debug-btn {
+            background: var(--neutral-200);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            margin-top: 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--neutral-600);
+            font-family: inherit;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 12px;
@@ -385,6 +408,8 @@
             <div id="update-timestamp">Ostatnia aktualizacja: ładowanie...</div>
         </div>
 
+        <div id="debug-info" class="debug-info"></div>
+
         <div id="loading" class="loading">
             <div>Ładowanie danych...</div>
         </div>
@@ -417,6 +442,7 @@
         
         <div id="info-footer" class="info-footer" style="display: none;">
             Dane są aktualizowane codziennie o godzinie 06:00. Źródło: Reflex.com.pl
+            <button id="toggle-debug" class="debug-btn">Pokaż informacje debugowania</button>
         </div>
     </div>
 
@@ -471,37 +497,103 @@
         let fuelData = null;
         let selectedFuelType = "PB95";
         let chart = null;
+        let debugLogs = [];
+
+        // Funkcja do dodawania logów debugowania
+        function addDebugLog(message) {
+            const timestamp = new Date().toISOString();
+            debugLogs.push(`${timestamp}: ${message}`);
+            
+            const debugInfoEl = document.getElementById('debug-info');
+            if (debugInfoEl) {
+                debugInfoEl.textContent = debugLogs.join('\n');
+            }
+        }
+
+        // Przykładowe dane na wypadek błędu ładowania
+        const FALLBACK_DATA = {
+            "update_timestamp": new Date().toISOString(),
+            "voivodeships": {
+                "dolnoslaskie": {
+                    "date": "2025-05-15",
+                    "prices": {"PB95": 5.72, "PB98": 6.53, "ON": 5.82, "LPG": 3.03}
+                },
+                "mazowieckie": {
+                    "date": "2025-05-15",
+                    "prices": {"PB95": 5.79, "PB98": 6.59, "ON": 5.89, "LPG": 3.09}
+                },
+                "wielkopolskie": {
+                    "date": "2025-05-15",
+                    "prices": {"PB95": 5.75, "PB98": 6.55, "ON": 5.85, "LPG": 3.05}
+                }
+            }
+        };
 
         // Pobierz dane o cenach paliw
         async function fetchFuelPrices() {
+            addDebugLog("Rozpoczęcie pobierania danych...");
+            
             try {
-                const response = await fetch('data/latest.json');
-                if (!response.ok) {
-                    throw new Error('Nie udało się pobrać danych. Spróbuj ponownie później.');
+                // Sprawdź istnienie katalogu data
+                const checkDataDir = async () => {
+                    try {
+                        const response = await fetch('data/');
+                        if (!response.ok) {
+                            throw new Error(`Brak dostępu do katalogu data/ (kod: ${response.status})`);
+                        }
+                        return true;
+                    } catch (err) {
+                        addDebugLog(`Błąd dostępu do katalogu data/: ${err.message}`);
+                        return false;
+                    }
+                };
+                
+                // Sprawdź katalog data
+            const dataDirExists = await checkDataDir();
+                if (!dataDirExists) {
+                    addDebugLog("Używam danych zapasowych, ponieważ katalog data/ nie jest dostępny");
+                    return FALLBACK_DATA;
                 }
                 
+                // Próba pobrania pliku latest.json
+                addDebugLog("Próba pobrania pliku latest.json");
+                const response = await fetch('data/latest.json');
+                
+                if (!response.ok) {
+                    const errorMsg = `Nie udało się pobrać danych: ${response.status} ${response.statusText}`;
+                    addDebugLog(errorMsg);
+                    throw new Error(errorMsg);
+                }
+                
+                addDebugLog("Odpowiedź uzyskana, parsowanie JSON...");
                 const data = await response.json();
+                addDebugLog(`Dane pomyślnie sparsowane, znaleziono ${Object.keys(data.voivodeships).length} województw`);
+                
+                return data;
+            } catch (error) {
+                addDebugLog(`Błąd: ${error.message}`);
+                
+                const errorElement = document.getElementById('error');
+                errorElement.style.display = 'block';
+                errorElement.innerHTML = `Wystąpił błąd podczas ładowania danych: ${error.message}<br>Użyto danych zapasowych.`;
+                
+                // Użyj danych zapasowych w przypadku błędu
+                return FALLBACK_DATA;
+            } finally {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('map-container').style.display = 'block';
                 document.getElementById('fuel-info').style.display = 'grid';
                 document.getElementById('info-footer').style.display = 'block';
                 document.getElementById('price-indicators').style.display = 'grid';
                 
-                // Aktualizuj informację o czasie aktualizacji
-                document.getElementById('update-timestamp').textContent = 
-                    `Ostatnia aktualizacja: ${data.update_timestamp}`;
-                
-                return data;
-            } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = error.message;
-                return null;
+                addDebugLog("Zakończone ustawianie widoczności elementów");
             }
         }
 
         // Analiza danych cenowych dla wybranego typu paliwa
         function analyzePrices(data, fuelType) {
+            addDebugLog(`Analiza cen dla paliwa: ${fuelType}`);
+            
             let prices = [];
             let minPrice = Number.MAX_VALUE;
             let maxPrice = 0;
@@ -526,13 +618,15 @@
             }
             
             // Oblicz średnią
-            let avgPrice = 0;
+        let avgPrice = 0;
             if (prices.length > 0) {
                 avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
             }
             
             // Zaokrąglij do 2 miejsc po przecinku
             avgPrice = Math.round(avgPrice * 100) / 100;
+            
+            addDebugLog(`Znaleziono ${prices.length} cen, min: ${minPrice} (${minLocation}), max: ${maxPrice} (${maxLocation}), avg: ${avgPrice}`);
             
             return {
                 min: minPrice,
@@ -545,11 +639,16 @@
 
         // Przygotuj dane do wyświetlenia na mapie
         function prepareMapData(data, fuelType) {
+            addDebugLog(`Przygotowanie danych mapy dla paliwa: ${fuelType}`);
+            
             const mapData = [];
             
             for (const voivodeship in data.voivodeships) {
                 const highchartsCode = reverseMapping[voivodeship];
-                if (!highchartsCode) continue;
+                if (!highchartsCode) {
+                    addDebugLog(`Brak mapowania dla województwa: ${voivodeship}`);
+                    continue;
+                }
                 
                 const price = data.voivodeships[voivodeship].prices[fuelType];
                 
@@ -568,6 +667,7 @@
                 }
             }
             
+            addDebugLog(`Przygotowano ${mapData.length} elementów mapy`);
             return mapData;
         }
 
@@ -585,6 +685,8 @@
 
         // Aktualizuj wskaźniki cenowe
         function updatePriceIndicators(data, fuelType) {
+            addDebugLog(`Aktualizacja wskaźników cenowych dla paliwa: ${fuelType}`);
+            
             const priceAnalysis = analyzePrices(data, fuelType);
             
             // Aktualizuj najniższą cenę
@@ -606,6 +708,8 @@
 
         // Aktualizuj informacje o cenach paliw dla poszczególnych województw
         function updateFuelInfo(data, fuelType) {
+            addDebugLog(`Aktualizacja kart informacyjnych dla paliwa: ${fuelType}`);
+            
             const container = document.getElementById('fuel-info');
             container.innerHTML = '';
 
@@ -624,7 +728,7 @@
             voivodeships.sort((a, b) => a.price - b.price);
             
             // Wyświetlenie top 4 najtańszych wojewóztw
-            for (let i = 0; i < 4 && i < voivodeships.length; i++) {
+        for (let i = 0; i < 4 && i < voivodeships.length; i++) {
                 const voivodeship = voivodeships[i];
                 const card = document.createElement('div');
                 card.className = 'fuel-card';
@@ -641,106 +745,122 @@
 
         // Utworzenie mapy
         function createMap(data, fuelType) {
+            addDebugLog("Tworzenie mapy...");
+            
+            // Aktualizuj informację o czasie aktualizacji
+            document.getElementById('update-timestamp').textContent = 
+                `Ostatnia aktualizacja: ${data.update_timestamp}`;
+            
             const priceAnalysis = analyzePrices(data, fuelType);
             const mapData = prepareMapData(data, fuelType);
             
-            // Inicjalizacja mapy Highcharts
-            chart = Highcharts.mapChart('map-container', {
-                chart: {
-                    map: 'countries/pl/pl-all',
-                    backgroundColor: 'transparent',
-                    style: {
-                        fontFamily: 'Plus Jakarta Sans, sans-serif'
-                    }
-                },
-                title: {
-                    text: null
-                },
-                subtitle: {
-                    text: null
-                },
-                mapNavigation: {
-                    enabled: true,
-                    buttonOptions: {
-                        verticalAlign: 'bottom',
+            try {
+                // Inicjalizacja mapy Highcharts
+                chart = Highcharts.mapChart('map-container', {
+                    chart: {
+                        map: 'countries/pl/pl-all',
+                        backgroundColor: 'transparent',
                         style: {
-                            color: var(--neutral-500)
-                        },
-                        theme: {
-                            fill: 'white',
-                            'stroke-width': 1,
-                            stroke: var(--neutral-200),
-                            r: 4,
-                            states: {
-                                hover: {
-                                    fill: var(--neutral-100)
-                                },
-                                select: {
-                                    stroke: var(--primary-color),
-                                    fill: var(--neutral-100)
+                            fontFamily: 'Plus Jakarta Sans, sans-serif'
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    subtitle: {
+                        text: null
+                    },
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'bottom',
+                            style: {
+                                color: '#64748b'
+                            },
+                            theme: {
+                                fill: 'white',
+                                'stroke-width': 1,
+                                stroke: '#e2e8f0',
+                                r: 4,
+                                states: {
+                                    hover: {
+                                        fill: '#f1f5f9'
+                                    },
+                                    select: {
+                                        stroke: '#5c7cfa',
+                                        fill: '#f1f5f9'
+                                    }
                                 }
                             }
                         }
-                    }
-                },
-                legend: {
-                    title: {
-                        text: 'Cena paliwa (PLN/litr)',
-                        style: {
-                            color: var(--neutral-700),
-                            fontWeight: '500'
-                        }
                     },
-                    backgroundColor: 'rgba(255, 255, 255, 0.7)'
-                },
-                colorAxis: {
-                    min: priceAnalysis.min,
-                    max: priceAnalysis.max,
-                    stops: [
-                        [0, var(--success-color)],    // zielony dla niskich cen
-                        [0.5, var(--warning-color)],  // żółty dla średnich cen
-                        [1, var(--danger-color)]      // czerwony dla wysokich cen
-                    ],
-                    labels: {
-                        format: '{value} zł',
-                        style: {
-                            color: var(--neutral-600)
-                        }
-                    }
-                },
-                series: [{
-                    data: mapData,
-                    name: getFuelName(fuelType),
-                    states: {
-                        hover: {
-                            color: var(--primary-color)
-                        }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.name}',
-                        style: {
-                            color: var(--neutral-800),
-                            textOutline: '1px solid white',
-                            fontWeight: '500'
-                        }
-                    },
-                    tooltip: {
-                        headerFormat: '',
-                        pointFormat: '<span style="font-size: 1rem; font-weight: 600;">{point.name}</span><br><span style="font-size: 1.1rem; font-weight: 700; color: var(--primary-color);">{point.value} zł</span>',
-                        style: {
-                            color: var(--neutral-800)
+                    legend: {
+                        title: {
+                            text: 'Cena paliwa (PLN/litr)',
+                            style: {
+                                color: '#334155',
+                                fontWeight: '500'
+                            }
                         },
-                        backgroundColor: 'rgba(255, 255, 255, 0.96)',
-                        borderWidth: 0,
-                        borderRadius: 8,
-                        shadow: true
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)'
                     },
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                    borderWidth: 0.5,
-                    nullColor: var(--neutral-100)
-                }]
-            });
+                    colorAxis: {
+                        min: priceAnalysis.min,
+                        max: priceAnalysis.max,
+                        stops: [
+                            [0, '#12b886'],    // zielony dla niskich cen
+                            [0.5, '#fab005'],  // żółty dla średnich cen
+                            [1, '#fa5252']     // czerwony dla wysokich cen
+                        ],
+                        labels: {
+                            format: '{value} zł',
+                            style: {
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    series: [{
+                        data: mapData,
+                        name: getFuelName(fuelType),
+                        states: {
+                            hover: {
+                                color: '#5c7cfa'
+                            }
+                        },
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.name}',
+                            style: {
+                                color: '#1e293b',
+                                textOutline: '1px solid white',
+                                fontWeight: '500'
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '',
+                            pointFormat: '<span style="font-size: 1rem; font-weight: 600;">{point.name}</span><br><span style="font-size: 1.1rem; font-weight: 700; color: #5c7cfa;">{point.value} zł</span>',
+                            style: {
+                                color: '#1e293b'
+                            },
+                            backgroundColor: 'rgba(255, 255, 255, 0.96)',
+                            borderWidth: 0,
+                            borderRadius: 8,
+                            shadow: true
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.5)',
+                        borderWidth: 0.5,
+                        nullColor: '#f1f5f9'
+                    }]
+                });
+                
+                addDebugLog("Mapa utworzona pomyślnie");
+            } catch (err) {
+                addDebugLog(`Błąd tworzenia mapy: ${err.message}`);
+                
+                const errorElement = document.getElementById('error');
+                errorElement.style.display = 'block';
+                errorElement.textContent = `Błąd tworzenia mapy: ${err.message}`;
+            }
             
             // Aktualizuj wskaźniki cenowe
             updatePriceIndicators(data, fuelType);
@@ -751,22 +871,34 @@
 
         // Aktualizuj mapę i powiązane dane
         function updateMapAndData() {
-            if (!fuelData || !chart) return;
+            if (!fuelData || !chart) {
+                addDebugLog("Brak danych lub mapy do aktualizacji");
+                return;
+            }
             
-            const priceAnalysis = analyzePrices(fuelData, selectedFuelType);
+            addDebugLog(`Aktualizacja mapy dla paliwa: ${selectedFuelType}`);
+            
+            const priceAnalysis =
+                analyzePrices(fuelData, selectedFuelType);
             const mapData = prepareMapData(fuelData, selectedFuelType);
             
-            // Aktualizuj oś kolorów
-            chart.colorAxis[0].update({
-                min: priceAnalysis.min,
-                max: priceAnalysis.max
-            });
-            
-            // Aktualizuj dane
-            chart.series[0].update({
-                name: getFuelName(selectedFuelType),
-                data: mapData
-            });
+            try {
+                // Aktualizuj oś kolorów
+                chart.colorAxis[0].update({
+                    min: priceAnalysis.min,
+                    max: priceAnalysis.max
+                });
+                
+                // Aktualizuj dane
+                chart.series[0].update({
+                    name: getFuelName(selectedFuelType),
+                    data: mapData
+                });
+                
+                addDebugLog("Mapa zaktualizowana pomyślnie");
+            } catch (err) {
+                addDebugLog(`Błąd aktualizacji mapy: ${err.message}`);
+            }
             
             // Aktualizuj wskaźniki cenowe
             updatePriceIndicators(fuelData, selectedFuelType);
@@ -777,6 +909,8 @@
 
         // Obsługa zmiany typu paliwa za pomocą segmentowanej kontrolki
         function setupSegmentedControl() {
+            addDebugLog("Konfiguracja kontrolek segmentów");
+            
             const segments = document.querySelectorAll('.segment');
             segments.forEach(segment => {
                 segment.addEventListener('click', (e) => {
@@ -788,6 +922,7 @@
                     
                     // Zaktualizuj wybrany typ paliwa
                     selectedFuelType = e.target.dataset.fuel;
+                    addDebugLog(`Zmieniono paliwo na: ${selectedFuelType}`);
                     
                     // Zaktualizuj dane
                     updateMapAndData();
@@ -795,17 +930,50 @@
             });
         }
 
+        // Obsługa przycisku debugowania
+        function setupDebugButton() {
+            const toggleButton = document.getElementById('toggle-debug');
+            const debugInfo = document.getElementById('debug-info');
+            
+            toggleButton.addEventListener('click', () => {
+                if (debugInfo.style.display === 'none') {
+                    debugInfo.style.display = 'block';
+                    toggleButton.textContent = 'Ukryj informacje debugowania';
+                } else {
+                    debugInfo.style.display = 'none';
+                    toggleButton.textContent = 'Pokaż informacje debugowania';
+                }
+            });
+        }
+
         // Główna funkcja inicjalizująca
         async function initialize() {
-            // Pobierz dane
-            fuelData = await fetchFuelPrices();
-            if (!fuelData) return;
+            addDebugLog("Inicjalizacja aplikacji...");
             
-            // Utwórz mapę
-            createMap(fuelData, selectedFuelType);
+            // Skonfiguruj przycisk debugowania
+            setupDebugButton();
             
-            // Ustaw obsługę zmiany typu paliwa
-            setupSegmentedControl();
+            try {
+                // Pobierz dane
+                fuelData = await fetchFuelPrices();
+                if (!fuelData) {
+                    throw new Error("Brak danych do wyświetlenia");
+                }
+                
+                // Utwórz mapę
+                createMap(fuelData, selectedFuelType);
+                
+                // Ustaw obsługę zmiany typu paliwa
+                setupSegmentedControl();
+                
+                addDebugLog("Aplikacja zainicjalizowana pomyślnie");
+            } catch (err) {
+                addDebugLog(`Błąd inicjalizacji aplikacji: ${err.message}`);
+                
+                const errorElement = document.getElementById('error');
+                errorElement.style.display = 'block';
+                errorElement.textContent = `Błąd inicjalizacji aplikacji: ${err.message}`;
+            }
         }
 
         // Uruchom po załadowaniu strony
