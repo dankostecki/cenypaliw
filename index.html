@@ -238,64 +238,6 @@
             border: 1px solid var(--neutral-200);
         }
 
-        .fuel-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .fuel-card {
-            background-color: white;
-            border-radius: var(--radius-md);
-            box-shadow: var(--card-shadow);
-            padding: 1.5rem;
-            text-align: center;
-            transition: var(--transition);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid var(--neutral-200);
-        }
-
-        .fuel-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--card-hover-shadow);
-        }
-
-        .fuel-card h3 {
-            font-size: 1rem;
-            margin-bottom: 0.7rem;
-            color: var(--neutral-700);
-            font-weight: 600;
-        }
-
-        .fuel-card .price {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.7rem;
-            line-height: 1.1;
-        }
-
-        .fuel-card .change {
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.3rem 0.8rem;
-            border-radius: var(--radius-full);
-            display: inline-block;
-            transition: var(--transition);
-        }
-
-        .decrease {
-            background-color: var(--success-light);
-            color: var(--success-dark);
-        }
-
-        .increase {
-            background-color: var(--danger-light);
-            color: var(--danger-dark);
-        }
-
         .info-footer {
             font-size: 0.85rem;
             color: var(--neutral-500);
@@ -343,29 +285,6 @@
             border-left: 3px solid var(--danger-color);
         }
 
-        .debug-info {
-            background-color: var(--warning-light);
-            color: var(--warning-dark);
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-            white-space: pre-wrap;
-            display: none;
-        }
-
-        .debug-btn {
-            background: var(--neutral-200);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-full);
-            margin-top: 1rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: var(--neutral-600);
-            font-family: inherit;
-        }
-
         @media (max-width: 768px) {
             .container {
                 padding: 12px;
@@ -408,8 +327,6 @@
             <div id="update-timestamp">Ostatnia aktualizacja: ładowanie...</div>
         </div>
 
-        <div id="debug-info" class="debug-info"></div>
-
         <div id="loading" class="loading">
             <div>Ładowanie danych...</div>
         </div>
@@ -436,13 +353,8 @@
         
         <div id="map-container" class="map-container" style="display: none;"></div>
         
-        <div id="fuel-info" class="fuel-info" style="display: none;">
-            <!-- Tutaj będą wyświetlane karty z informacjami o cenach -->
-        </div>
-        
         <div id="info-footer" class="info-footer" style="display: none;">
             Dane są aktualizowane codziennie o godzinie 06:00. Źródło: Reflex.com.pl
-            <button id="toggle-debug" class="debug-btn">Pokaż informacje debugowania</button>
         </div>
     </div>
 
@@ -518,18 +430,6 @@
             }
         };
 
-        // Debugowanie
-        let debugLogs = [];
-        function addDebugLog(message) {
-            const timestamp = new Date().toISOString();
-            debugLogs.push(`${timestamp}: ${message}`);
-            
-            const debugInfoEl = document.getElementById('debug-info');
-            if (debugInfoEl) {
-                debugInfoEl.textContent = debugLogs.join('\n');
-            }
-        }
-
         // Globalne zmienne
         let fuelData = null;
         let selectedFuelType = "PB95";
@@ -537,28 +437,14 @@
 
         // Inicjalizacja
         async function initialize() {
-            addDebugLog("Inicjalizacja aplikacji...");
-            
-            // Skonfiguruj przycisk debugowania
-            document.getElementById('toggle-debug').addEventListener('click', function() {
-                const debugInfo = document.getElementById('debug-info');
-                if (debugInfo.style.display === 'none') {
-                    debugInfo.style.display = 'block';
-                    this.textContent = 'Ukryj informacje debugowania';
-                } else {
-                    debugInfo.style.display = 'none';
-                    this.textContent = 'Pokaż informacje debugowania';
-                }
-            });
-            
             // Pobierz dane
             try {
                 const response = await fetch('data/latest.json');
                 if (response.ok) {
                     fuelData = await response.json();
-                    addDebugLog("Dane pobrane pomyślnie");
+                    console.log("Dane pobrane pomyślnie");
                 } else {
-                    addDebugLog(`Błąd pobierania danych: ${response.status}. Używam danych zapasowych.`);
+                    console.log(`Błąd pobierania danych: ${response.status}. Używam danych zapasowych.`);
                     fuelData = FALLBACK_DATA;
                     
                     // Pokaż informację o użyciu danych zapasowych
@@ -566,7 +452,7 @@
                     document.getElementById('error').textContent = 'Uwaga: Używamy przykładowych danych. Rzeczywiste ceny mogą się różnić.';
                 }
             } catch (error) {
-                addDebugLog(`Wyjątek podczas pobierania danych: ${error.message}. Używam danych zapasowych.`);
+                console.log(`Wyjątek podczas pobierania danych: ${error.message}. Używam danych zapasowych.`);
                 fuelData = FALLBACK_DATA;
                 
                 // Pokaż informację o użyciu danych zapasowych
@@ -577,7 +463,6 @@
             // Ukryj loader, pokaż zawartość
             document.getElementById('loading').style.display = 'none';
             document.getElementById('map-container').style.display = 'block';
-            document.getElementById('fuel-info').style.display = 'grid';
             document.getElementById('info-footer').style.display = 'block';
             document.getElementById('price-indicators').style.display = 'grid';
             
@@ -594,8 +479,6 @@
 
         // Utworzenie mapy
         function createHighchartsMap() {
-            addDebugLog("Tworzenie mapy...");
-            
             try {
                 // Przygotuj dane
                 const mapData = [];
@@ -658,7 +541,7 @@
                     // Dokładne mapowanie dla każdego województwa
                     if (voivodeship === 'dolnoslaskie') highchartsKey = 'pl-ds';
                     else if (voivodeship === 'kujawsko-pomorskie') highchartsKey = 'pl-kp';
-                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lb';
+                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lu';
                     else if (voivodeship === 'lubuskie') highchartsKey = 'pl-lb';
                     else if (voivodeship === 'lodzkie') highchartsKey = 'pl-ld';
                     else if (voivodeship === 'malopolskie') highchartsKey = 'pl-ma';
@@ -681,9 +564,6 @@
                         });
                     }
                 }
-                
-                // Wypisz dane do debugowania
-                addDebugLog(`Przygotowano dane dla mapy: ${mapData.length} województw`);
                 
                 // Inicjalizacja mapy Highcharts
                 chart = Highcharts.mapChart('map-container', {
@@ -782,13 +662,7 @@
                         nullColor: '#f1f5f9'
                     }]
                 });
-                
-                // Aktualizuj sekcję najtańszych województw
-                updateFuelInfo();
-                
-                addDebugLog("Mapa utworzona pomyślnie");
             } catch (err) {
-                addDebugLog(`Błąd tworzenia mapy: ${err.message}`);
                 console.error(err);
                 
                 document.getElementById('error').style.display = 'block';
@@ -798,8 +672,6 @@
 
         // Aktualizacja mapy po zmianie paliwa
         function updateMap() {
-            addDebugLog(`Aktualizacja mapy dla paliwa: ${selectedFuelType}`);
-            
             try {
                 // Powtórz logikę z createHighchartsMap, ale tylko dla aktualizacji
                 const mapData = [];
@@ -853,7 +725,7 @@
                     
                     if (voivodeship === 'dolnoslaskie') highchartsKey = 'pl-ds';
                     else if (voivodeship === 'kujawsko-pomorskie') highchartsKey = 'pl-kp';
-                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lb';
+                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lu';
                     else if (voivodeship === 'lubuskie') highchartsKey = 'pl-lb';
                     else if (voivodeship === 'lodzkie') highchartsKey = 'pl-ld';
                     else if (voivodeship === 'malopolskie') highchartsKey = 'pl-ma';
@@ -886,48 +758,8 @@
                     name: getFuelName(selectedFuelType),
                     data: mapData
                 });
-                
-                updateFuelInfo();
-                
-                addDebugLog("Mapa zaktualizowana pomyślnie");
             } catch (err) {
-                addDebugLog(`Błąd aktualizacji mapy: ${err.message}`);
                 console.error(err);
-            }
-        }
-
-        // Aktualizacja kart z najtańszymi województwami
-        function updateFuelInfo() {
-            const container = document.getElementById('fuel-info');
-            container.innerHTML = '';
-
-            // Sortuj województwa według ceny (od najniższej do najwyższej)
-            let voivodeships = [];
-            for (const voivodeship in fuelData.voivodeships) {
-                const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                if (price !== null && price !== undefined) {
-                    voivodeships.push({
-                        name: voivodeship,
-                        price: price
-                    });
-                }
-            }
-            
-            voivodeships.sort((a, b) => a.price - b.price);
-            
-            // Wyświetlenie top 4 najtańszych wojewóztw
-            for (let i = 0; i < 4 && i < voivodeships.length; i++) {
-                const voivodeship = voivodeships[i];
-                const card = document.createElement('div');
-                card.className = 'fuel-card';
-                
-                card.innerHTML = `
-                    <h3>${getPolishName(voivodeship.name)}</h3>
-                    <div class="price">${voivodeship.price.toFixed(2)} zł</div>
-                    <div class="change decrease">Najtańsze w kraju</div>
-                `;
-                
-                container.appendChild(card);
             }
         }
 
@@ -944,7 +776,6 @@
                     
                     // Zaktualizuj wybrany typ paliwa
                     selectedFuelType = e.target.dataset.fuel;
-                    addDebugLog(`Zmieniono paliwo na: ${selectedFuelType}`);
                     
                     // Zaktualizuj dane
                     updateMap();
