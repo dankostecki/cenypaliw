@@ -318,6 +318,12 @@
 
     <div class="container">
         <div class="card">
+            <!-- Nowy przełącznik dla wyboru źródła danych -->
+            <div class="segmented-control">
+                <div class="segment active" data-source="voivodeships">Województwa</div>
+                <div class="segment" data-source="cities">Miasta wojewódzkie</div>
+            </div>
+            <!-- Istniejący przełącznik dla typów paliw -->
             <div class="segmented-control">
                 <div class="segment active" data-fuel="PB95">Benzyna 95</div>
                 <div class="segment" data-fuel="PB98">Benzyna 98</div>
@@ -431,29 +437,68 @@
         };
 
         // Globalne zmienne
-        let fuelData = null;
+        let fuelData = null;     // Dane dla województw
+        let citiesData = null;   // Dane dla miast
         let selectedFuelType = "PB95";
+        let selectedDataSource = "voivodeships"; // Domyślnie województwa
         let chart = null;
+
+        // Mapowanie miast wojewódzkich do województw
+        const cityToVoivodeship = {
+            "Wrocław": "dolnoslaskie",
+            "Bydgoszcz": "kujawsko-pomorskie",
+            "Lublin": "lubelskie",
+            "Gorzów Wlkp.": "lubuskie",
+            "Łódź": "lodzkie",
+            "Kraków": "malopolskie",
+            "Warszawa": "mazowieckie",
+            "Opole": "opolskie",
+            "Rzeszów": "podkarpackie",
+            "Białystok": "podlaskie",
+            "Gdańsk": "pomorskie",
+            "Katowice": "slaskie",
+            "Kielce": "swietokrzyskie",
+            "Olsztyn": "warminsko-mazurskie",
+            "Poznań": "wielkopolskie",
+            "Szczecin": "zachodniopomorskie"
+        };
 
         // Inicjalizacja
         async function initialize() {
-            // Pobierz dane
             try {
-                const response = await fetch('data/latest.json');
-                if (response.ok) {
-                    fuelData = await response.json();
-                    console.log("Dane pobrane pomyślnie");
+                // Pobierz dane dla województw
+                const responseVoivodeships = await fetch('data/latest.json');
+                if (responseVoivodeships.ok) {
+                    fuelData = await responseVoivodeships.json();
+                    console.log("Dane dla województw pobrane pomyślnie");
                 } else {
-                    console.log(`Błąd pobierania danych: ${response.status}. Używam danych zapasowych.`);
+                    console.log(`Błąd pobierania danych województw: ${responseVoivodeships.status}. Używam danych zapasowych.`);
                     fuelData = FALLBACK_DATA;
                     
                     // Pokaż informację o użyciu danych zapasowych
                     document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').textContent = 'Uwaga: Używamy przykładowych danych. Rzeczywiste ceny mogą się różnić.';
+                    document.getElementById('error').textContent = 'Uwaga: Używamy przykładowych danych dla województw. Rzeczywiste ceny mogą się różnić.';
+                }
+
+                // Pobierz dane dla miast
+                const responseCities = await fetch('data/cities.json');
+                if (responseCities.ok) {
+                    citiesData = await responseCities.json();
+                    console.log("Dane dla miast pobrane pomyślnie");
+                } else {
+                    console.log(`Błąd pobierania danych miast: ${responseCities.status}.`);
+                    citiesData = null;
+                    
+                    // Pokaż informację o błędzie pobierania danych miast
+                    if (!document.getElementById('error').style.display === 'block') {
+                        document.getElementById('error').style.display = 'block';
+                        document.getElementById('error').textContent = 'Uwaga: Nie udało się pobrać danych dla miast wojewódzkich.';
+                    }
                 }
             } catch (error) {
                 console.log(`Wyjątek podczas pobierania danych: ${error.message}. Używam danych zapasowych.`);
                 fuelData = FALLBACK_DATA;
+                citiesData = null;
                 
                 // Pokaż informację o użyciu danych zapasowych
                 document.getElementById('error').style.display = 'block';
@@ -466,104 +511,34 @@
             document.getElementById('info-footer').style.display = 'block';
             document.getElementById('price-indicators').style.display = 'grid';
             
-            // Aktualizuj informację o czasie aktualizacji
-            document.getElementById('update-timestamp').textContent = 
-                `Ostatnia aktualizacja: ${fuelData.national_date}`;
+            // Aktualizuj informację o czasie aktualizacji (dla województw - domyślnie)
+            updateTimestamp();
             
             // Utwórz mapę
             createHighchartsMap();
             
-            // Ustaw obsługę zmiany typu paliwa
-            setupSegmentedControl();
+            // Ustaw obsługę przełączników
+            setupSegmentedControls();
+        }
+
+        // Funkcja aktualizująca informację o czasie aktualizacji
+        function updateTimestamp() {
+            if (selectedDataSource === "voivodeships") {
+                document.getElementById('update-timestamp').textContent = 
+                    `Ostatnia aktualizacja: ${fuelData.national_date}`;
+            } else if (selectedDataSource === "cities" && citiesData) {
+                document.getElementById('update-timestamp').textContent = citiesData.cities_header;
+            }
         }
 
         // Utworzenie mapy
         function createHighchartsMap() {
             try {
-                // Przygotuj dane
-                const mapData = [];
-                const prices = [];
+                // Przygotuj dane dla wybranego źródła
+                const mapData = prepareMapData();
                 
-                // Zbierz wszystkie ceny dla wybranego paliwa
-                for (const voivodeship in fuelData.voivodeships) {
-                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                    if (price !== null && price !== undefined) {
-                        prices.push(price);
-                    }
-                }
-                
-                // Oblicz min/max/avg
-                let minPrice = Math.min(...prices);
-                let maxPrice = Math.max(...prices);
-                let avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-                
-                // Zaokrąglij do 2 miejsc po przecinku
-                minPrice = Math.floor(minPrice * 100) / 100;
-                maxPrice = Math.ceil(maxPrice * 100) / 100;
-                avgPrice = Math.round(avgPrice * 100) / 100;
-                
-                // Znajdź województwa z najniższą i najwyższą ceną
-                let minVoivodeship = '';
-                let maxVoivodeship = '';
-                
-                for (const voivodeship in fuelData.voivodeships) {
-                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                    if (price === minPrice) {
-                        minVoivodeship = voivodeship;
-                    }
-                    if (price === maxPrice) {
-                        maxVoivodeship = voivodeship;
-                    }
-                }
-                
-                // Aktualizuj wskaźniki cenowe
-                document.getElementById('lowest-price').innerHTML = 
-                    minPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                document.getElementById('lowest-location').textContent = 
-                    getPolishName(minVoivodeship);
-                    
-                document.getElementById('average-price').innerHTML = 
-                    avgPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                    
-                document.getElementById('highest-price').innerHTML = 
-                    maxPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                document.getElementById('highest-location').textContent = 
-                    getPolishName(maxVoivodeship);
-                
-                // Przygotuj dane dla mapy
-                // Klucz do rozwiązania problemu: użycie poprawnych kodów województw z Highmaps
-                for (const voivodeship in fuelData.voivodeships) {
-                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                    
-                    // Mapowanie województw na kody Highmaps
-                    let highchartsKey = '';
-                    
-                    // Dokładne mapowanie dla każdego województwa
-                    if (voivodeship === 'dolnoslaskie') highchartsKey = 'pl-ds';
-                    else if (voivodeship === 'kujawsko-pomorskie') highchartsKey = 'pl-kp';
-                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lu';
-                    else if (voivodeship === 'lubuskie') highchartsKey = 'pl-lb';
-                    else if (voivodeship === 'lodzkie') highchartsKey = 'pl-ld';
-                    else if (voivodeship === 'malopolskie') highchartsKey = 'pl-ma';
-                    else if (voivodeship === 'mazowieckie') highchartsKey = 'pl-mz';
-                    else if (voivodeship === 'opolskie') highchartsKey = 'pl-op';
-                    else if (voivodeship === 'podkarpackie') highchartsKey = 'pl-pk';
-                    else if (voivodeship === 'podlaskie') highchartsKey = 'pl-pd';
-                    else if (voivodeship === 'pomorskie') highchartsKey = 'pl-pm';
-                    else if (voivodeship === 'slaskie') highchartsKey = 'pl-sl';
-                    else if (voivodeship === 'swietokrzyskie') highchartsKey = 'pl-sk';
-                    else if (voivodeship === 'warminsko-mazurskie') highchartsKey = 'pl-wn';
-                    else if (voivodeship === 'wielkopolskie') highchartsKey = 'pl-wp';
-                    else if (voivodeship === 'zachodniopomorskie') highchartsKey = 'pl-zp';
-                    
-                    if (highchartsKey && price !== null && price !== undefined) {
-                        mapData.push({
-                            'hc-key': highchartsKey,
-                            value: price,
-                            name: getPolishName(voivodeship)
-                        });
-                    }
-                }
+                // Oblicz min/max/avg i aktualizuj wskaźniki
+                updatePriceIndicators(mapData);
                 
                 // Inicjalizacja mapy Highcharts
                 chart = Highcharts.mapChart('map-container', {
@@ -615,8 +590,8 @@
                         backgroundColor: 'rgba(255, 255, 255, 0.7)'
                     },
                     colorAxis: {
-                        min: minPrice,
-                        max: maxPrice,
+                        min: mapData.minPrice,
+                        max: mapData.maxPrice,
                         stops: [
                             [0, '#12b886'],    // zielony dla niskich cen
                             [0.5, '#fab005'],  // żółty dla średnich cen
@@ -630,7 +605,7 @@
                         }
                     },
                     series: [{
-                        data: mapData,
+                        data: mapData.data,
                         name: getFuelName(selectedFuelType),
                         states: {
                             hover: {
@@ -670,13 +645,13 @@
             }
         }
 
-        // Aktualizacja mapy po zmianie paliwa
-        function updateMap() {
-            try {
-                // Powtórz logikę z createHighchartsMap, ale tylko dla aktualizacji
-                const mapData = [];
-                const prices = [];
-                
+        // Przygotowanie danych dla mapy w zależności od wybranego źródła
+        function prepareMapData() {
+            const mapData = [];
+            const prices = [];
+            
+            if (selectedDataSource === "voivodeships") {
+                // Zbierz wszystkie ceny dla wybranego paliwa z województw
                 for (const voivodeship in fuelData.voivodeships) {
                     const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
                     if (price !== null && price !== undefined) {
@@ -684,61 +659,10 @@
                     }
                 }
                 
-                let minPrice = Math.min(...prices);
-                let maxPrice = Math.max(...prices);
-                let avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-                
-                minPrice = Math.floor(minPrice * 100) / 100;
-                maxPrice = Math.ceil(maxPrice * 100) / 100;
-                avgPrice = Math.round(avgPrice * 100) / 100;
-                
-                let minVoivodeship = '';
-                let maxVoivodeship = '';
-                
+                // Przygotuj dane dla województw
                 for (const voivodeship in fuelData.voivodeships) {
                     const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                    if (price === minPrice) {
-                        minVoivodeship = voivodeship;
-                    }
-                    if (price === maxPrice) {
-                        maxVoivodeship = voivodeship;
-                    }
-                }
-                
-                document.getElementById('lowest-price').innerHTML = 
-                    minPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                document.getElementById('lowest-location').textContent = 
-                    getPolishName(minVoivodeship);
-                    
-                document.getElementById('average-price').innerHTML = 
-                    avgPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                    
-                document.getElementById('highest-price').innerHTML = 
-                    maxPrice.toFixed(2) + '<span class="unit">zł/l</span>';
-                document.getElementById('highest-location').textContent = 
-                    getPolishName(maxVoivodeship);
-                
-                for (const voivodeship in fuelData.voivodeships) {
-                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
-                    
-                    let highchartsKey = '';
-                    
-                    if (voivodeship === 'dolnoslaskie') highchartsKey = 'pl-ds';
-                    else if (voivodeship === 'kujawsko-pomorskie') highchartsKey = 'pl-kp';
-                    else if (voivodeship === 'lubelskie') highchartsKey = 'pl-lu';
-                    else if (voivodeship === 'lubuskie') highchartsKey = 'pl-lb';
-                    else if (voivodeship === 'lodzkie') highchartsKey = 'pl-ld';
-                    else if (voivodeship === 'malopolskie') highchartsKey = 'pl-ma';
-                    else if (voivodeship === 'mazowieckie') highchartsKey = 'pl-mz';
-                    else if (voivodeship === 'opolskie') highchartsKey = 'pl-op';
-                    else if (voivodeship === 'podkarpackie') highchartsKey = 'pl-pk';
-                    else if (voivodeship === 'podlaskie') highchartsKey = 'pl-pd';
-                    else if (voivodeship === 'pomorskie') highchartsKey = 'pl-pm';
-                    else if (voivodeship === 'slaskie') highchartsKey = 'pl-sl';
-                    else if (voivodeship === 'swietokrzyskie') highchartsKey = 'pl-sk';
-                    else if (voivodeship === 'warminsko-mazurskie') highchartsKey = 'pl-wn';
-                    else if (voivodeship === 'wielkopolskie') highchartsKey = 'pl-wp';
-                    else if (voivodeship === 'zachodniopomorskie') highchartsKey = 'pl-zp';
+                    let highchartsKey = getHighchartsKey(voivodeship);
                     
                     if (highchartsKey && price !== null && price !== undefined) {
                         mapData.push({
@@ -748,28 +672,124 @@
                         });
                     }
                 }
+            } else if (selectedDataSource === "cities" && citiesData) {
+                // Zbierz wszystkie ceny dla wybranego paliwa z miast
+                for (const city in citiesData.cities) {
+                    const price = citiesData.cities[city].prices[selectedFuelType];
+                    if (price !== null && price !== undefined) {
+                        prices.push(price);
+                    }
+                }
                 
+                // Przygotuj dane dla miast (wyświetlane na obszarach województw)
+                for (const city in citiesData.cities) {
+                    const price = citiesData.cities[city].prices[selectedFuelType];
+                    const voivodeship = cityToVoivodeship[city];
+                    let highchartsKey = getHighchartsKey(voivodeship);
+                    
+                    if (highchartsKey && price !== null && price !== undefined) {
+                        mapData.push({
+                            'hc-key': highchartsKey,
+                            value: price,
+                            name: city // Użyj nazwy miasta zamiast województwa
+                        });
+                    }
+                }
+            }
+            
+            // Oblicz min/max
+            const minPrice = Math.floor(Math.min(...prices) * 100) / 100;
+            const maxPrice = Math.ceil(Math.max(...prices) * 100) / 100;
+            const avgPrice = Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length * 100) / 100;
+            
+            return {
+                data: mapData,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                avgPrice: avgPrice,
+                prices: prices
+            };
+        }
+
+        // Aktualizuj wskaźniki cenowe
+        function updatePriceIndicators(mapData) {
+            let minPrice = mapData.minPrice;
+            let maxPrice = mapData.maxPrice;
+            let avgPrice = mapData.avgPrice;
+            
+            // Znajdź lokalizację z najniższą i najwyższą ceną
+            let minLocation = '';
+            let maxLocation = '';
+            
+            if (selectedDataSource === "voivodeships") {
+                for (const voivodeship in fuelData.voivodeships) {
+                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
+                    if (price === minPrice) {
+                        minLocation = getPolishName(voivodeship);
+                    }
+                    if (price === maxPrice) {
+                        maxLocation = getPolishName(voivodeship);
+                    }
+                }
+            } else if (selectedDataSource === "cities" && citiesData) {
+                for (const city in citiesData.cities) {
+                    const price = citiesData.cities[city].prices[selectedFuelType];
+                    if (price === minPrice) {
+                        minLocation = city;
+                    }
+                    if (price === maxPrice) {
+                        maxLocation = city;
+                    }
+                }
+            }
+            
+            document.getElementById('lowest-price').innerHTML = 
+                minPrice.toFixed(2) + '<span class="unit">zł/l</span>';
+            document.getElementById('lowest-location').textContent = minLocation;
+                
+            document.getElementById('average-price').innerHTML = 
+                avgPrice.toFixed(2) + '<span class="unit">zł/l</span>';
+                
+            document.getElementById('highest-price').innerHTML = 
+                maxPrice.toFixed(2) + '<span class="unit">zł/l</span>';
+            document.getElementById('highest-location').textContent = maxLocation;
+        }
+
+        // Aktualizacja mapy po zmianie paliwa lub źródła danych
+        function updateMap() {
+            try {
+                // Przygotuj nowe dane
+                const mapData = prepareMapData();
+                
+                // Aktualizuj wskaźniki cenowe
+                updatePriceIndicators(mapData);
+                
+                // Aktualizuj timestamp/nagłówek
+                updateTimestamp();
+                
+                // Aktualizuj mapę
                 chart.colorAxis[0].update({
-                    min: minPrice,
-                    max: maxPrice
+                    min: mapData.minPrice,
+                    max: mapData.maxPrice
                 });
                 
                 chart.series[0].update({
                     name: getFuelName(selectedFuelType),
-                    data: mapData
+                    data: mapData.data
                 });
             } catch (err) {
                 console.error(err);
             }
         }
 
-        // Obsługa zmiany typu paliwa
-        function setupSegmentedControl() {
-            const segments = document.querySelectorAll('.segment');
-            segments.forEach(segment => {
+        // Obsługa przełączników
+        function setupSegmentedControls() {
+            // Przełącznik dla typu paliwa
+            const fuelSegments = document.querySelectorAll('.segment[data-fuel]');
+            fuelSegments.forEach(segment => {
                 segment.addEventListener('click', (e) => {
                     // Usuń klasę active ze wszystkich segmentów
-                    segments.forEach(s => s.classList.remove('active'));
+                    fuelSegments.forEach(s => s.classList.remove('active'));
                     
                     // Dodaj klasę active do klikniętego segmentu
                     e.target.classList.add('active');
@@ -781,6 +801,49 @@
                     updateMap();
                 });
             });
+            
+            // Przełącznik dla źródła danych
+            const sourceSegments = document.querySelectorAll('.segment[data-source]');
+            sourceSegments.forEach(segment => {
+                segment.addEventListener('click', (e) => {
+                    // Usuń klasę active ze wszystkich segmentów
+                    sourceSegments.forEach(s => s.classList.remove('active'));
+                    
+                    // Dodaj klasę active do klikniętego segmentu
+                    e.target.classList.add('active');
+                    
+                    // Zaktualizuj wybrane źródło danych
+                    selectedDataSource = e.target.dataset.source;
+                    
+                    // Zaktualizuj dane
+                    updateMap();
+                });
+            });
+        }
+
+        // Funkcja zwracająca klucz Highcharts dla województwa
+        function getHighchartsKey(voivodeship) {
+            // Mapowanie województw na kody Highmaps
+            const voivodeshipToHighchartsKey = {
+                "dolnoslaskie": "pl-ds",
+                "kujawsko-pomorskie": "pl-kp",
+                "lubelskie": "pl-lu",
+                "lubuskie": "pl-lb",
+                "lodzkie": "pl-ld",
+                "malopolskie": "pl-ma",
+                "mazowieckie": "pl-mz",
+                "opolskie": "pl-op",
+                "podkarpackie": "pl-pk",
+                "podlaskie": "pl-pd",
+                "pomorskie": "pl-pm",
+                "slaskie": "pl-sl",
+                "swietokrzyskie": "pl-sk",
+                "warminsko-mazurskie": "pl-wn",
+                "wielkopolskie": "pl-wp",
+                "zachodniopomorskie": "pl-zp"
+            };
+            
+            return voivodeshipToHighchartsKey[voivodeship] || '';
         }
 
         // Pomocnicze funkcje
