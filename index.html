@@ -341,7 +341,7 @@
         
         <div id="price-indicators" class="price-indicators" style="display: none;">
             <div class="price-circle lowest-circle">
-                <div class="circle-label">Najniższa cena</div>
+                <div class="circle-label" id="circle-label-lowest">Najniższa cena</div>
                 <div class="circle-price" id="lowest-price">0.00<span class="unit">zł/l</span></div>
                 <div class="circle-location" id="lowest-location">Województwo</div>
             </div>
@@ -351,7 +351,7 @@
                 <div class="circle-location">Cała Polska</div>
             </div>
             <div class="price-circle highest-circle">
-                <div class="circle-label">Najwyższa cena</div>
+                <div class="circle-label" id="circle-label-highest">Najwyższa cena</div>
                 <div class="circle-price" id="highest-price">0.00<span class="unit">zł/l</span></div>
                 <div class="circle-location" id="highest-location">Województwo</div>
             </div>
@@ -655,7 +655,8 @@
                 for (const voivodeship in fuelData.voivodeships) {
                     const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
                     if (price !== null && price !== undefined) {
-                        prices.push(price);
+                        // Zaokrąglij cenę do dwóch miejsc po przecinku
+                        prices.push(Math.round(price * 100) / 100);
                     }
                 }
                 
@@ -667,7 +668,7 @@
                     if (highchartsKey && price !== null && price !== undefined) {
                         mapData.push({
                             'hc-key': highchartsKey,
-                            value: price,
+                            value: Math.round(price * 100) / 100, // Zaokrąglij cenę
                             name: getPolishName(voivodeship)
                         });
                     }
@@ -677,7 +678,8 @@
                 for (const city in citiesData.cities) {
                     const price = citiesData.cities[city].prices[selectedFuelType];
                     if (price !== null && price !== undefined) {
-                        prices.push(price);
+                        // Zaokrąglij cenę do dwóch miejsc po przecinku
+                        prices.push(Math.round(price * 100) / 100);
                     }
                 }
                 
@@ -690,16 +692,16 @@
                     if (highchartsKey && price !== null && price !== undefined) {
                         mapData.push({
                             'hc-key': highchartsKey,
-                            value: price,
+                            value: Math.round(price * 100) / 100, // Zaokrąglij cenę
                             name: city // Użyj nazwy miasta zamiast województwa
                         });
                     }
                 }
             }
             
-            // Oblicz min/max
-            const minPrice = Math.floor(Math.min(...prices) * 100) / 100;
-            const maxPrice = Math.ceil(Math.max(...prices) * 100) / 100;
+            // Oblicz min/max/avg i zaokrąglij do dwóch miejsc po przecinku
+            const minPrice = Math.round(Math.min(...prices) * 100) / 100;
+            const maxPrice = Math.round(Math.max(...prices) * 100) / 100;
             const avgPrice = Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length * 100) / 100;
             
             return {
@@ -722,8 +724,9 @@
             let maxLocation = '';
             
             if (selectedDataSource === "voivodeships") {
+                // Dla województw
                 for (const voivodeship in fuelData.voivodeships) {
-                    const price = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
+                    const price = Math.round(fuelData.voivodeships[voivodeship].prices[selectedFuelType] * 100) / 100;
                     if (price === minPrice) {
                         minLocation = getPolishName(voivodeship);
                     }
@@ -732,17 +735,25 @@
                     }
                 }
             } else if (selectedDataSource === "cities" && citiesData) {
+                // Dla miast
                 for (const city in citiesData.cities) {
-                    const price = citiesData.cities[city].prices[selectedFuelType];
+                    const price = Math.round(citiesData.cities[city].prices[selectedFuelType] * 100) / 100;
                     if (price === minPrice) {
-                        minLocation = city;
+                        minLocation = city; // Użyj nazwy miasta
                     }
                     if (price === maxPrice) {
-                        maxLocation = city;
+                        maxLocation = city; // Użyj nazwy miasta
                     }
                 }
             }
             
+            // Aktualizuj etykiety dla najniższej i najwyższej ceny
+            document.getElementById('circle-label-lowest').textContent = 
+                selectedDataSource === "voivodeships" ? "Najniższa cena" : "Najniższa cena (miasto)";
+            document.getElementById('circle-label-highest').textContent = 
+                selectedDataSource === "voivodeships" ? "Najwyższa cena" : "Najwyższa cena (miasto)";
+            
+            // Aktualizuj wartości cen
             document.getElementById('lowest-price').innerHTML = 
                 minPrice.toFixed(2) + '<span class="unit">zł/l</span>';
             document.getElementById('lowest-location').textContent = minLocation;
