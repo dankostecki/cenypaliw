@@ -1,6 +1,7 @@
 {
-  "update_timestamp": "2025-05-21 09:28:49",
+  "update_timestamp": "2025-05-21 10:11:15",
   "national_date": "2025-05-15",
+  "cities_date": "2025-05-15",
   "voivodeships": {
     "dolnoslaskie": {
       "date": "2025-05-15",
@@ -138,13 +139,14 @@
       }
     },
     "zachodniopomorskie": {
-      "date": "2025-05-15",
+      "date": null,
       "prices": {
-        "PB95": 5.7,
-        "PB98": 6.47,
-        "ON": 5.7,
-        "LPG": 3.05
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
       }
     }
-  }
+  },
+  "cities": {}
 }
