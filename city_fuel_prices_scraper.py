@@ -69,16 +69,14 @@ def scrape_cities_data():
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Szukanie daty aktualizacji
-        date_text = None
-        date_header = soup.find('h2', text=lambda t: t and re.search(r'w dniu \d{4}-\d{2}-\d{2}', t))
+        # Szukanie nagłówka z datą aktualizacji - pobieramy cały nagłówek, nie tylko datę
+        header_text = None
+        date_header = soup.find('h2', text=lambda t: t and "Detaliczne ceny paliw w poszczególnych miastach wojewódzkich" in t)
         if date_header:
-            date_match = re.search(r'(\d{4}-\d{2}-\d{2})', date_header.text)
-            if date_match:
-                date_text = date_match.group(1)
-                logger.info(f"Znaleziono datę: {date_text}")
+            header_text = date_header.text.strip()
+            logger.info(f"Znaleziono nagłówek: {header_text}")
         else:
-            logger.warning("Nie znaleziono daty na stronie")
+            logger.warning("Nie znaleziono nagłówka z datą na stronie")
         
         # Szukanie tabeli z cenami miast wojewódzkich
         cities_data = {}
@@ -135,7 +133,7 @@ def scrape_cities_data():
                 logger.info(f"Pobrano dane dla miasta: {city_name}")
         
         logger.info(f"Pobrano dane dla {len(cities_data)} miast")
-        return date_text, cities_data
+        return header_text, cities_data
         
     except Exception as e:
         logger.error(f"Wystąpił błąd podczas pobierania danych dla miast: {str(e)}")
@@ -148,11 +146,11 @@ def main():
     logger.info("Rozpoczynam pobieranie cen paliw dla miast")
     
     # Pobierz dane miast
-    date_text, cities_data = scrape_cities_data()
+    header_text, cities_data = scrape_cities_data()
     
     results = {
         "update_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "cities_date": date_text,
+        "cities_header": header_text,
         "cities": cities_data
     }
     
