@@ -306,6 +306,204 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Style dla sekcji porównania cen */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--neutral-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: var(--neutral-500);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .comparison-controls {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .sort-button {
+            background-color: var(--neutral-100);
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-700);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sort-button:hover {
+            background-color: var(--neutral-200);
+        }
+
+        .sort-button.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-dark);
+            color: white;
+        }
+
+        .price-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .comparison-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            border: 1px solid var(--neutral-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comparison-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .comparison-locations {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--neutral-200);
+            padding-bottom: 0.75rem;
+        }
+
+        .location {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--neutral-700);
+        }
+
+        .location.city {
+            color: var(--primary-dark);
+        }
+
+        .price-comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .price-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: var(--neutral-600);
+            margin-bottom: 0.25rem;
+        }
+
+        .price-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--neutral-800);
+        }
+
+        .difference-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .difference-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .difference-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .difference-percent {
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.1rem;
+        }
+
+        .difference-text {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-top: 0.2rem;
+        }
+
+        .cheaper {
+            color: var(--success-color);
+        }
+
+        .cheaper::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--success-light);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .more-expensive {
+            color: var(--danger-color);
+        }
+
+        .more-expensive::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--danger-light);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .fuel-tag {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-bottom-left-radius: var(--radius-sm);
+        }
+
+        @media (max-width: 768px) {
+            .price-comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-controls {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -358,6 +556,22 @@
         </div>
         
         <div id="map-container" class="map-container" style="display: none;"></div>
+        
+        <!-- Nowa sekcja kart różnicy cenowej -->
+        <div id="comparison-cards-container" class="card" style="display: none;">
+            <h2 class="section-title">Porównanie cen: Miasto vs. Województwo</h2>
+            <p class="section-description">Gdzie warto tankować? Zobacz różnice cenowe między miastami wojewódzkimi a średnią w województwach.</p>
+            
+            <div class="comparison-controls">
+                <button id="sort-savings" class="sort-button active">Największe oszczędności</button>
+                <button id="sort-expense" class="sort-button">Największe dopłaty</button>
+                <button id="sort-alphabetical" class="sort-button">Alfabetycznie</button>
+            </div>
+            
+            <div id="price-comparison-cards" class="price-comparison-grid">
+                <!-- Karty będą generowane dynamicznie przez JavaScript -->
+            </div>
+        </div>
         
         <div id="info-footer" class="info-footer" style="display: none;">
             Źródło: Reflex.com.pl oraz WNP.pl
@@ -519,6 +733,12 @@
             
             // Ustaw obsługę przełączników
             setupSegmentedControls();
+            
+            // Wygeneruj karty porównawcze
+            generateComparisonCards();
+            
+            // Ustaw obsługę sortowania
+            setupSortingButtons();
         }
 
         // Funkcja aktualizująca informację o czasie aktualizacji
@@ -788,9 +1008,149 @@
                     name: getFuelName(selectedFuelType),
                     data: mapData.data
                 });
+                
+                // Aktualizuj karty porównawcze
+                generateComparisonCards();
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        // Funkcja generująca karty porównawcze
+        function generateComparisonCards() {
+            // Sprawdź czy mamy dane dla miast i województw
+            if (!fuelData || !citiesData) {
+                console.error("Brak danych potrzebnych do porównania");
+                return;
+            }
+            
+            const cardsContainer = document.getElementById('price-comparison-cards');
+            cardsContainer.innerHTML = ''; // Wyczyść container
+            
+            // Utwórz tablicę z danymi porównawczymi
+            const comparisons = [];
+            
+            for (const city in citiesData.cities) {
+                const voivodeship = cityToVoivodeship[city];
+                
+                if (voivodeship && fuelData.voivodeships[voivodeship]) {
+                    const cityPrice = citiesData.cities[city].prices[selectedFuelType];
+                    const voivodeshipPrice = fuelData.voivodeships[voivodeship].prices[selectedFuelType];
+                    
+                    if (cityPrice !== null && voivodeshipPrice !== null) {
+                        // Oblicz różnicę (wartość i procent)
+                        const difference = (cityPrice - voivodeshipPrice).toFixed(2);
+                        const percentDifference = ((cityPrice - voivodeshipPrice) / voivodeshipPrice * 100).toFixed(1);
+                        
+                        comparisons.push({
+                            city: city,
+                            voivodeship: getPolishName(voivodeship),
+                            cityPrice: cityPrice.toFixed(2),
+                            voivodeshipPrice: voivodeshipPrice.toFixed(2),
+                            difference: parseFloat(difference),
+                            percentDifference: percentDifference,
+                            isCheaper: difference < 0
+                        });
+                    }
+                }
+            }
+            
+            // Posortuj według różnicy cen (domyślnie: największe oszczędności)
+            comparisons.sort((a, b) => a.difference - b.difference);
+            
+            // Utwórz kartę dla każdego porównania
+            comparisons.forEach(comparison => {
+                const card = document.createElement('div');
+                card.className = 'comparison-card';
+                card.dataset.difference = comparison.difference;
+                
+                const differenceClass = comparison.isCheaper ? 'cheaper' : 'more-expensive';
+                const differenceSymbol = comparison.isCheaper ? '↓' : '↑';
+                const differenceText = comparison.isCheaper ? 'TANIEJ' : 'DROŻEJ';
+                
+                card.innerHTML = `
+                    <div class="fuel-tag">${getFuelName(selectedFuelType)}</div>
+                    <div class="comparison-locations">
+                        <div class="location city">${comparison.city}</div>
+                        <div class="location region">${comparison.voivodeship}</div>
+                    </div>
+                    <div class="price-comparison">
+                        <div class="price-column">
+                            <div class="price-label">Miasto</div>
+                            <div class="price-value">${comparison.cityPrice} zł</div>
+                        </div>
+                        <div class="difference-indicator ${differenceClass}">
+                            <div class="difference-arrow">${differenceSymbol}</div>
+                            <div class="difference-value">${Math.abs(comparison.difference)} zł</div>
+                            <div class="difference-percent">${Math.abs(comparison.percentDifference)}%</div>
+                            <div class="difference-text">${differenceText}</div>
+                        </div>
+                        <div class="price-column">
+                            <div class="price-label">Województwo</div>
+                            <div class="price-value">${comparison.voivodeshipPrice} zł</div>
+                        </div>
+                    </div>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+            
+            // Pokaż kontener z kartami
+            document.getElementById('comparison-cards-container').style.display = 'block';
+        }
+
+        // Obsługa przycisków sortowania
+        function setupSortingButtons() {
+            document.getElementById('sort-savings').addEventListener('click', function() {
+                sortComparisonCards('savings');
+                updateSortButtonsState(this);
+            });
+            
+            document.getElementById('sort-expense').addEventListener('click', function() {
+                sortComparisonCards('expense');
+                updateSortButtonsState(this);
+            });
+            
+            document.getElementById('sort-alphabetical').addEventListener('click', function() {
+                sortComparisonCards('alphabetical');
+                updateSortButtonsState(this);
+            });
+        }
+
+        // Aktualizacja stanu przycisków sortowania
+        function updateSortButtonsState(activeButton) {
+            const sortButtons = document.querySelectorAll('.sort-button');
+            sortButtons.forEach(button => button.classList.remove('active'));
+            activeButton.classList.add('active');
+        }
+
+        // Funkcja sortująca karty
+        function sortComparisonCards(sortType) {
+            const cardsContainer = document.getElementById('price-comparison-cards');
+            const cards = Array.from(cardsContainer.children);
+            
+            switch(sortType) {
+                case 'savings':
+                    // Sortuj od największej oszczędności do największej dopłaty
+                    cards.sort((a, b) => parseFloat(a.dataset.difference) - parseFloat(b.dataset.difference));
+                    break;
+                case 'expense':
+                    // Sortuj od największej dopłaty do największej oszczędności
+                    cards.sort((a, b) => parseFloat(b.dataset.difference) - parseFloat(a.dataset.difference));
+                    break;
+                case 'alphabetical':
+                    // Sortuj alfabetycznie według nazwy miasta
+                    cards.sort((a, b) => {
+                        const cityA = a.querySelector('.location.city').textContent;
+                        const cityB = b.querySelector('.location.city').textContent;
+                        return cityA.localeCompare(cityB);
+                    });
+                    break;
+            }
+            
+            // Wyczyść container i dodaj karty w nowej kolejności
+            cardsContainer.innerHTML = '';
+            cards.forEach(card => cardsContainer.appendChild(card));
         }
 
         // Obsługa przełączników
