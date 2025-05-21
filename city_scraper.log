@@ -1,0 +1,21 @@
+2025-05-21 11:25:42,388 - city_fuel_prices_scraper - INFO - Rozpoczynam pobieranie cen paliw dla miast
+2025-05-21 11:25:42,389 - city_fuel_prices_scraper - INFO - Pobieranie danych dla miast wojewódzkich
+2025-05-21 11:25:43,333 - city_fuel_prices_scraper - INFO - Znaleziono datę: 2025-05-15
+2025-05-21 11:25:43,337 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Białystok
+2025-05-21 11:25:43,337 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Bydgoszcz
+2025-05-21 11:25:43,337 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Gdańsk
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Gorzów Wlkp.
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Katowice
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Kielce
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Kraków
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Lublin
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Łódź
+2025-05-21 11:25:43,338 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Olsztyn
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Opole
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Poznań
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Rzeszów
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Szczecin
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Warszawa
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Wrocław
+2025-05-21 11:25:43,339 - city_fuel_prices_scraper - INFO - Pobrano dane dla 16 miast
+2025-05-21 11:25:43,340 - city_fuel_prices_scraper - INFO - Dane miast zostały zapisane do pliku data/cities.json
