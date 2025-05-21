@@ -17,6 +17,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("fuel_prices_scraper")
 
+# URL strony z cenami krajowymi
+NATIONAL_URL = "https://www.reflex.com.pl/ceny-detaliczne-polska"
+
 # Lista województw i ich stron
 VOIVODESHIPS = {
     "dolnoslaskie": "https://www.reflex.com.pl/dolnoslaskie-wojewodztwo",
@@ -54,6 +57,45 @@ def extract_price(text):
     try:
         return float(clean_text)
     except ValueError:
+        return None
+
+def scrape_national_date():
+    """Pobiera datę z krajowej strony cen paliw"""
+    logger.info("Pobieranie daty z krajowej strony cen paliw")
+    
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(NATIONAL_URL, headers=headers, timeout=30)
+        
+        if response.status_code != 200:
+            logger.error(f"Błąd podczas pobierania strony krajowej: {response.status_code}")
+            return None
+        
+        # Zapisujemy HTML do pliku dla celów debugowych
+        debug_dir = "debug"
+        os.makedirs(debug_dir, exist_ok=True)
+        with open(f"{debug_dir}/national_page.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Szukanie daty aktualizacji
+        date_text = None
+        date_header = soup.find('th', text=lambda t: t and re.search(r'\d{4}-\d{2}-\d{2}', t))
+        if date_header:
+            date_text = date_header.text.strip()
+            logger.info(f"Znaleziono datę krajową: {date_text}")
+        else:
+            logger.warning("Nie znaleziono daty na stronie krajowej")
+        
+        return date_text
+        
+    except Exception as e:
+        logger.error(f"Wystąpił błąd podczas pobierania daty krajowej: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return None
 
 def scrape_voivodeship(voivodeship_name, url):
@@ -128,8 +170,12 @@ def main():
     """Główna funkcja programu"""
     logger.info("Rozpoczynam pobieranie cen paliw")
     
+    # Pobierz datę z krajowej strony
+    national_date = scrape_national_date()
+    
     results = {
         "update_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "national_date": national_date,
         "voivodeships": {}
     }
     
