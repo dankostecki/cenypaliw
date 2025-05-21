@@ -142,17 +142,12 @@ def main():
     output_dir = "data"
     os.makedirs(output_dir, exist_ok=True)
     
-    # Zapisujemy najnowsze dane
+    # Zapisujemy tylko najnowsze dane (bez tworzenia plików historycznych)
     latest_file = os.path.join(output_dir, "latest.json")
     with open(latest_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     
-    # Zapisujemy dane również z datą w nazwie pliku
-    date_file = os.path.join(output_dir, f"fuel_prices_{datetime.now().strftime('%Y-%m-%d')}.json")
-    with open(date_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-    
-    logger.info(f"Dane zostały zapisane do plików {latest_file} i {date_file}")
+    logger.info(f"Dane zostały zapisane do pliku {latest_file}")
 
 
 if __name__ == "__main__":
