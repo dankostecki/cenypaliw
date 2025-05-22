@@ -2,7 +2,7 @@ name: Daily City Fuel Prices Scraper
 
 on:
   schedule:
-    - cron: '0 10 * * *'
+    - cron: '0 6 * * 5'
   workflow_dispatch:
 
 jobs:
