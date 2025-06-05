@@ -124,3 +124,24 @@
 2025-05-30 06:52:55,828 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Wrocław
 2025-05-30 06:52:55,828 - city_fuel_prices_scraper - INFO - Pobrano dane dla 16 miast
 2025-05-30 06:52:55,829 - city_fuel_prices_scraper - INFO - Dane miast zostały zapisane do pliku data/cities.json
+2025-06-05 08:43:53,689 - city_fuel_prices_scraper - INFO - Rozpoczynam pobieranie cen paliw dla miast
+2025-06-05 08:43:53,689 - city_fuel_prices_scraper - INFO - Pobieranie danych dla miast wojewódzkich
+2025-06-05 08:43:54,937 - city_fuel_prices_scraper - INFO - Znaleziono nagłówek: Detaliczne ceny paliw w poszczególnych miastach wojewódzkich w dniu 2025-06-04
+2025-06-05 08:43:54,940 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Białystok
+2025-06-05 08:43:54,940 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Bydgoszcz
+2025-06-05 08:43:54,940 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Gdańsk
+2025-06-05 08:43:54,940 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Gorzów Wlkp.
+2025-06-05 08:43:54,940 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Katowice
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Kielce
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Kraków
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Lublin
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Łódź
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Olsztyn
+2025-06-05 08:43:54,941 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Opole
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Poznań
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Rzeszów
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Szczecin
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Warszawa
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla miasta: Wrocław
+2025-06-05 08:43:54,942 - city_fuel_prices_scraper - INFO - Pobrano dane dla 16 miast
+2025-06-05 08:43:54,943 - city_fuel_prices_scraper - INFO - Dane miast zostały zapisane do pliku data/cities.json
