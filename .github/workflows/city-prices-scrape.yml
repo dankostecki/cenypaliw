@@ -1,5 +1,3 @@
-city-prices-scrape.yml
-
 name: Daily City Fuel Prices Scraper
 on:
   schedule:
