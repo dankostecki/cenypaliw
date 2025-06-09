@@ -1,7 +1,7 @@
 name: Daily City Fuel Prices Scraper
 on:
   schedule:
-    - cron: '30 6 * * *'  # 30 minutes after the first scraper
+    - cron: '0 8 * * *'  # Daily at 6:00 AM instead of only on Fridays
   workflow_dispatch:
 
 jobs:
