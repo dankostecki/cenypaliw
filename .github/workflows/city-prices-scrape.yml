@@ -2,7 +2,7 @@ name: Daily City Fuel Prices Scraper
 
 on:
   schedule:
-    - cron: '0 6 * * 5'
+    - cron: '30 6 * * *'  # 30 minut po pierwszym scraper-ze
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,9 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Pobiera całą historię, ważne dla pull --rebase
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -28,13 +30,21 @@ jobs:
     - name: Run scraper
       run: python city_fuel_prices_scraper.py
 
+    - name: Check for changes
+      id: verify-changed-files
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Commit and push changes
+      if: steps.verify-changed-files.outputs.changed == 'true'
       run: |
         git config --global user.name 'GitHub Actions Bot'
         git config --global user.email 'actions@github.com'
-        git add -A
-        if ! git diff --quiet || ! git diff --staged --quiet; then
-          git commit -m "Update city fuel prices data: $(date +'%Y-%m-%d')"
-          git pull --rebase origin main
-          git push
-        fi
+        git add data/
+        git pull --rebase origin main  # Pobierz zmiany i zrób rebase
+        git commit -m "Update city fuel prices data: $(date +'%Y-%m-%d %H:%M:%S')"
+        git push origin main
