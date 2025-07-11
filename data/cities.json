@@ -1,133 +1,13 @@
 {
-  "update_timestamp": "2025-07-10 06:35:48",
-  "cities_header": "Detaliczne ceny paliw w poszczególnych miastach wojewódzkich w dniu 2025-07-02",
+  "update_timestamp": "2025-07-11 06:35:18",
+  "cities_header": "Detaliczne ceny paliw w poszczególnych miastach wojewódzkich w dniu 2025-07-09",
   "cities": {
-    "Białystok": {
-      "prices": {
-        "PB95": 5.954,
-        "PB98": 6.696,
-        "ON": 6.052,
-        "LPG": 2.792
-      }
-    },
-    "Bydgoszcz": {
-      "prices": {
-        "PB95": 6.065,
-        "PB98": 6.843,
-        "ON": 6.195,
-        "LPG": 2.743
-      }
-    },
-    "Gdańsk": {
-      "prices": {
-        "PB95": 5.851,
-        "PB98": 6.573,
-        "ON": 5.891,
-        "LPG": 2.74
-      }
-    },
-    "Gorzów Wlkp.": {
-      "prices": {
-        "PB95": 5.971,
-        "PB98": 6.8817,
-        "ON": 6.011,
-        "LPG": 2.99
-      }
-    },
-    "Katowice": {
-      "prices": {
-        "PB95": 5.93,
-        "PB98": 6.821,
-        "ON": 6.062,
-        "LPG": 2.634
-      }
-    },
-    "Kielce": {
-      "prices": {
-        "PB95": 6.142,
-        "PB98": 6.89,
-        "ON": 6.201,
-        "LPG": 2.681
-      }
-    },
-    "Kraków": {
-      "prices": {
-        "PB95": 5.883,
-        "PB98": 6.7528,
-        "ON": 5.944,
-        "LPG": 2.58
-      }
-    },
-    "Lublin": {
-      "prices": {
-        "PB95": 6.0413,
-        "PB98": 6.7811,
-        "ON": 6.1111,
-        "LPG": 2.7
-      }
-    },
-    "Łódź": {
-      "prices": {
-        "PB95": 5.903,
-        "PB98": 6.697,
-        "ON": 6.002,
-        "LPG": 2.633
-      }
-    },
-    "Olsztyn": {
-      "prices": {
-        "PB95": 5.975,
-        "PB98": 6.725,
-        "ON": 6.063,
-        "LPG": 2.711
-      }
-    },
-    "Opole": {
-      "prices": {
-        "PB95": 6.128,
-        "PB98": 6.969,
-        "ON": 6.174,
-        "LPG": 2.733
-      }
-    },
-    "Poznań": {
-      "prices": {
-        "PB95": 5.9712,
-        "PB98": 6.651,
-        "ON": 6.1211,
-        "LPG": 2.691
-      }
-    },
-    "Rzeszów": {
-      "prices": {
-        "PB95": 5.963,
-        "PB98": 6.711,
-        "ON": 5.994,
-        "LPG": 2.742
-      }
-    },
-    "Szczecin": {
-      "prices": {
-        "PB95": 5.89,
-        "PB98": 6.734,
-        "ON": 5.983,
-        "LPG": 2.944
-      }
-    },
-    "Warszawa": {
-      "prices": {
-        "PB95": 6.135,
-        "PB98": 6.805,
-        "ON": 6.214,
-        "LPG": 2.872
-      }
-    },
     "Wrocław": {
       "prices": {
-        "PB95": 5.834,
-        "PB98": 6.563,
-        "ON": 6.045,
-        "LPG": 2.792
+        "PB95": 5.8114,
+        "PB98": 6.492,
+        "ON": 6.105,
+        "LPG": 2.736
       }
     }
   }
