@@ -1,5 +1,150 @@
 {
-  "update_timestamp": "2025-08-22 05:17:49",
+  "update_timestamp": "2025-08-23 05:15:56",
   "national_date": null,
-  "voivodeships": {}
+  "voivodeships": {
+    "dolnoslaskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "kujawsko-pomorskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "lubelskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "lubuskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "lodzkie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "malopolskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "mazowieckie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "opolskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "podkarpackie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "podlaskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "pomorskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "slaskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "swietokrzyskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "warminsko-mazurskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "wielkopolskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    },
+    "zachodniopomorskie": {
+      "date": null,
+      "prices": {
+        "PB95": null,
+        "PB98": null,
+        "ON": null,
+        "LPG": null
+      }
+    }
+  }
 }
