@@ -1,13 +1,13 @@
 {
-  "update_timestamp": "2025-11-06 06:35:15",
-  "cities_header": "Detaliczne ceny paliw w poszczególnych miastach wojewódzkich w dniu 2025-10-29",
+  "update_timestamp": "2025-11-07 06:35:03",
+  "cities_header": "Detaliczne ceny paliw w poszczególnych miastach wojewódzkich w dniu 2025-11-05",
   "cities": {
     "Wrocław": {
       "prices": {
-        "PB95": 5.845,
-        "PB98": 6.655,
-        "ON": 6.031,
-        "LPG": 2.63
+        "PB95": 5.862,
+        "PB98": 6.641,
+        "ON": 6.074,
+        "LPG": 2.612
       }
     }
   }
